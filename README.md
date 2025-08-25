@@ -8,7 +8,7 @@ A Model Context Protocol (MCP) server for Apollo.io that integrates with Claude 
     - [Step 1: Get Your Apollo API Key](#step-1-get-your-apollo-api-key)
     - [Step 2: Configure Claude Desktop](#step-2-configure-claude-desktop)
       - [Using npx (Recommended)](#using-npx-recommended)
-      - [Using Developer Installation](#using-developer-installation)
+      - [If using a Developer Installation (unlikely)](#if-using-a-developer-installation-unlikely)
     - [Step 3: Test the Integration](#step-3-test-the-integration)
   - [Manual Setup (For Developers)](#manual-setup-for-developers)
     - [Claude Desktop Configuration for Source Installation](#claude-desktop-configuration-for-source-installation)
@@ -99,7 +99,7 @@ Add this configuration to your Claude Desktop MCP settings:
 }
 ```
 
-#### Using Developer Installation
+#### If using a Developer Installation (unlikely)
 
 ```json
 {
@@ -125,6 +125,9 @@ Once configured, restart Claude Desktop and try asking:
 - "Search for software companies in California with 50-200 employees"
 - "Find C-level executives in the healthcare industry"
 - "Enrich the company data for google.com"
+
+
+
 
 ## Manual Setup (For Developers)
 
@@ -417,6 +420,17 @@ The API key setup is covered in the [Claude Desktop Setup](#claude-desktop-setup
 3. Make your changes
 4. Add tests for new functionality
 5. Submit a pull request
+
+## Releasing
+
+This project uses semantic versioning and automated publishing. See [RELEASING.md](RELEASING.md) for detailed instructions.
+
+Quick release commands:
+```bash
+npm run release:patch  # Bug fixes
+npm run release:minor  # New features
+npm run release:major  # Breaking changes
+```
 
 ## License
 

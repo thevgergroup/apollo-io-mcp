@@ -31,7 +31,10 @@
     "test:coverage": "vitest run --coverage",
     "inspector": "npx @modelcontextprotocol/inspector --config mcp-inspector.json",
     "inspector:cli": "npx @modelcontextprotocol/inspector --cli --config mcp-inspector.json --server apollo",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major"
   },
   "dependencies": {
     "zod": "^3.23.8",
