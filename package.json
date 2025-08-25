@@ -1,6 +1,6 @@
 {
   "name": "@thevgergroup/apollo-io-mcp",
-  "version": "0.1.11",
+  "version": "1.0.0",
   "description": "Model Context Protocol (MCP) server for Apollo.io API integration",
   "keywords": [
     "mcp",
