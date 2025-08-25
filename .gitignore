@@ -1,0 +1,19 @@
+node_modules
+dist
+.env
+coverage
+*.log
+
+# MCP Inspector config (may contain sensitive data)
+mcp-inspector.json
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test-*.js
