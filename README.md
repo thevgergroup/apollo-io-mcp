@@ -89,7 +89,7 @@ Add this configuration to your Claude Desktop MCP settings:
   "mcpServers": {
     "apollo": {
       "command": "npx",
-      "args": ["@thevgergroup/apollo-io-mcp"],
+      "args": ["@thevgergroup/apollo-io-mcp@latest"],
       "env": {
         "APOLLO_API_KEY": "your-actual-api-key-here",
         "APOLLO_BASE_URL": "https://api.apollo.io/api/v1"
