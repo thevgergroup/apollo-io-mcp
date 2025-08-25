@@ -34,7 +34,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/post-build.js",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "prepare": "npm run build",
