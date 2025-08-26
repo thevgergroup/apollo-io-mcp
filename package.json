@@ -51,7 +51,7 @@
   "dependencies": {
     "zod": "^3.23.8",
     "undici": "^6.19.8",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.2.1",
     "@modelcontextprotocol/sdk": "^1.17.4"
   },
   "devDependencies": {
