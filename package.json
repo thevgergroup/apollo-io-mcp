@@ -49,18 +49,18 @@
     "release:major": "node scripts/release.js major"
   },
   "dependencies": {
-    "zod": "^3.23.8",
-    "undici": "^6.19.8",
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "dotenv": "^16.4.5",
-    "@modelcontextprotocol/sdk": "^1.17.4"
+    "undici": "^6.19.8",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.16.5",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "tsx": "^4.19.1",
     "typescript": "^5.5.4",
-    "vitest": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8",
-    "@types/node": "^22.0.0",
-    "@modelcontextprotocol/inspector": "^0.16.5"
+    "vitest": "^3.2.4"
   },
   "files": [
     "dist",
