@@ -1,0 +1,56 @@
+# Dependabot configuration for Apollo.io MCP Server
+# This file configures automatic dependency updates for npm and GitHub Actions
+
+version: 2
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Group minor and patch updates together to reduce PR noise
+    groups:
+      minor-patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Allow up to 10 open PRs for dependency updates
+    open-pull-requests-limit: 10
+    # Automatically merge patch updates for dev dependencies
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Ignore major version updates for critical dependencies
+    ignore:
+      # Ignore major updates to TypeScript (can be breaking)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # Ignore major updates to vitest (can be breaking)
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      # Ignore major updates to @modelcontextprotocol/sdk (can be breaking)
+      - dependency-name: "@modelcontextprotocol/sdk"
+        update-types: ["version-update:semver-major"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    # Allow up to 5 open PRs for GitHub Actions updates
+    open-pull-requests-limit: 5
+    # Automatically merge patch updates for GitHub Actions
+    commit-message:
+      prefix: "ci"
+      include: "scope"
