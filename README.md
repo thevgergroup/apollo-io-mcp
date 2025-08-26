@@ -1,5 +1,7 @@
 # Apollo.io MCP Server
 
+![Apollo.io MCP Server](https://github.com/thevgergroup/apollo-io-mcp/raw/main/docs/apollo_logo_social.jpg)
+
 A Model Context Protocol (MCP) server for Apollo.io that integrates with Claude Desktop. This server provides access to Apollo's comprehensive B2B database for people and company search, enrichment, and insights.
 
 - [Apollo.io MCP Server](#apolloio-mcp-server)
