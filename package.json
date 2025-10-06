@@ -55,7 +55,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@modelcontextprotocol/inspector": "^0.16.5",
+    "@modelcontextprotocol/inspector": "^0.17.0",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "tsx": "^4.19.1",
