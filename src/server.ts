@@ -110,7 +110,7 @@ const BulkEnrichOrganizationsInput = z.object({
 const NewsArticlesSearchInput = z
   .object({
     query: z.string().optional(),
-    filters: z.record(z.any()).optional(),
+    filters: z.record(z.string(), z.any()).optional(),
   })
   .merge(PaginationSchema);
 
@@ -570,7 +570,7 @@ server.registerTool(
     description: "Search for news articles related to companies in Apollo. Supports 'query', 'filters', pagination.",
     inputSchema: {
       query: z.string().optional(),
-      filters: z.record(z.any()).optional(),
+      filters: z.record(z.string(), z.any()).optional(),
       page: z.number().optional(),
       per_page: z.number().optional()
     }
