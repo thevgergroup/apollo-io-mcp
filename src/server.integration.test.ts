@@ -73,9 +73,6 @@ describe('Apollo MCP Server Integration Tests', () => {
 
       mockApolloClient.searchCompanies.mockResolvedValue(mockApiResponse);
 
-      // Import server after mocking
-      const { default: handler } = await import('./server.js');
-
       const result = await mockApolloClient.searchCompanies({ q: 'test' });
 
       // Verify the response uses organizations field
