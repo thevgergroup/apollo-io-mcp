@@ -127,25 +127,25 @@ server.registerTool(
       filters: z.object({
         // Location filters
         locations: z.array(z.string()).optional().describe("Person locations (cities, states, countries)"),
-        
+
         // Role and seniority filters
         seniority: z.array(z.string()).optional().describe("Seniority levels (e.g., ['C-Level', 'VP', 'Director'])"),
         titles: z.array(z.string()).optional().describe("Job titles (e.g., ['CEO', 'CTO', 'Sales Manager'])"),
         departments: z.array(z.string()).optional().describe("Departments (e.g., ['Engineering', 'Sales', 'Marketing'])"),
-        
+
         // Company filters
         company_domains: z.array(z.string()).optional().describe("Company domains (e.g., ['google.com', 'microsoft.com'])"),
         company_names: z.array(z.string()).optional().describe("Company names"),
-        
+
         // Industry filters
         industries: z.array(z.string()).optional().describe("Industries (e.g., ['Software', 'Healthcare', 'Finance'])"),
-        
+
         // Technology filters
         technologies: z.array(z.string()).optional().describe("Technologies they use (e.g., ['python', 'react', 'salesforce'])"),
-        
+
         // Experience filters
         years_of_experience: z.array(z.string()).optional().describe("Experience ranges (e.g., ['1-3', '4-6', '7-10'])"),
-        
+
         // Education filters
         education_degrees: z.array(z.string()).optional().describe("Education degrees (e.g., ['MBA', 'PhD', 'Bachelor'])"),
         education_schools: z.array(z.string()).optional().describe("Education institutions")
@@ -164,7 +164,7 @@ server.registerTool(
       if (parsed.per_page) body.per_page = parsed.per_page;
 
       const result = await apollo.searchPeople(body) as any;
-      
+
       // Simplify the response for Claude Desktop
       const simplifiedPeople = result.people?.map((person: any) => ({
         id: person.id,
@@ -210,24 +210,24 @@ server.registerTool(
       filters: z.object({
         // Employee size filters
         organization_num_employees_ranges: z.array(z.string()).optional().describe("Employee count ranges in comma format (e.g., ['11,20', '21,50']). Very restrictive - may return 0 results if too narrow."),
-        
+
         // Location filters (most effective)
         organization_locations: z.array(z.string()).optional().describe("Company locations (cities, states, countries). Most effective filter for narrowing results."),
         organization_not_locations: z.array(z.string()).optional().describe("Exclude companies from specific locations"),
-        
+
         // Industry/Keyword filters (crucial for targeting)
         q_organization_keyword_tags: z.array(z.string()).optional().describe("Industry keywords for filtering (e.g., ['edtech', 'saas', 'fintech']). Essential for industry targeting."),
         q_organization_name: z.string().optional().describe("Specific company name filter"),
-        
+
         // Technology filters
         currently_using_any_of_technology_uids: z.array(z.string()).optional().describe("Technologies companies use (e.g., ['salesforce', 'aws', 'react'])"),
-        
+
         // Revenue filters
         revenue_range: z.object({
           min: z.number().optional(),
           max: z.number().optional()
         }).optional().describe("Revenue range in dollars (no commas/symbols)"),
-        
+
         // Funding filters
         latest_funding_amount_range: z.object({
           min: z.number().optional(),
@@ -237,7 +237,7 @@ server.registerTool(
           min: z.number().optional(),
           max: z.number().optional()
         }).optional().describe("Total funding amount range"),
-        
+
         // Job-related filters
         q_organization_job_titles: z.array(z.string()).optional().describe("Job titles in active postings"),
         organization_job_locations: z.array(z.string()).optional().describe("Job posting locations"),
@@ -254,11 +254,11 @@ server.registerTool(
     try {
       const parsed = SearchCompaniesInput.parse(args || {});
       const body: Record<string, unknown> = {};
-      
+
       if (parsed.query) body.q = parsed.query;
       if (parsed.page) body.page = parsed.page;
       if (parsed.per_page) body.per_page = parsed.per_page;
-      
+
       // Map filters according to Apollo.io API documentation
       if (parsed.filters) {
         // Handle employee ranges - convert from "11-20" format to "11,20" format
@@ -270,17 +270,17 @@ server.registerTool(
             return range;
           });
         }
-        
+
         // Handle locations
         if (parsed.filters.organization_locations) {
           body.organization_locations = parsed.filters.organization_locations;
         }
-        
+
         // Handle excluded locations
         if (parsed.filters.organization_not_locations) {
           body.organization_not_locations = parsed.filters.organization_not_locations;
         }
-        
+
                                         // Handle revenue ranges
                 if (parsed.filters.revenue_range) {
                   (body as any).revenue_range = {};
@@ -291,22 +291,22 @@ server.registerTool(
                     (body as any).revenue_range.max = parsed.filters.revenue_range.max;
                   }
                 }
-                
+
                 // Handle technologies
                 if (parsed.filters.currently_using_any_of_technology_uids) {
                   body.currently_using_any_of_technology_uids = parsed.filters.currently_using_any_of_technology_uids;
                 }
-                
+
                 // Handle organization keywords
                 if (parsed.filters.q_organization_keyword_tags) {
                   body.q_organization_keyword_tags = parsed.filters.q_organization_keyword_tags;
                 }
-                
+
                 // Handle organization name
                 if (parsed.filters.q_organization_name) {
                   body.q_organization_name = parsed.filters.q_organization_name;
                 }
-                
+
                 // Handle funding ranges
                 if (parsed.filters.latest_funding_amount_range) {
                   (body as any).latest_funding_amount_range = {};
@@ -317,7 +317,7 @@ server.registerTool(
                     (body as any).latest_funding_amount_range.max = parsed.filters.latest_funding_amount_range.max;
                   }
                 }
-                
+
                 if (parsed.filters.total_funding_range) {
                   (body as any).total_funding_range = {};
                   if (parsed.filters.total_funding_range.min) {
@@ -327,16 +327,16 @@ server.registerTool(
                     (body as any).total_funding_range.max = parsed.filters.total_funding_range.max;
                   }
                 }
-                
+
                 // Handle job-related filters
                 if (parsed.filters.q_organization_job_titles) {
                   body.q_organization_job_titles = parsed.filters.q_organization_job_titles;
                 }
-                
+
                 if (parsed.filters.organization_job_locations) {
                   body.organization_job_locations = parsed.filters.organization_job_locations;
                 }
-                
+
                 if (parsed.filters.organization_num_jobs_range) {
                   (body as any).organization_num_jobs_range = {};
                   if (parsed.filters.organization_num_jobs_range.min) {
@@ -349,9 +349,10 @@ server.registerTool(
       }
 
       const result = await apollo.searchCompanies(body) as any;
-      
+
       // Simplify the response for Claude Desktop
-      const simplifiedCompanies = result.accounts?.map((company: any) => ({
+      // 🐛 FIX: Changed from result.accounts to result.organizations
+      const simplifiedCompanies = result.organizations?.map((company: any) => ({
         id: company.id,
         name: company.name,
         website: company.website_url,
