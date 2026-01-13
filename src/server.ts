@@ -83,7 +83,9 @@ const EnrichPersonInput = z.object({
   email: z.string().email().optional(),
   linkedin_url: z.string().url().optional(),
   name: z.string().optional(),
-  company: z.string().optional()
+  company: z.string().optional(),
+  reveal_personal_emails: z.boolean().optional(),
+  reveal_phone_number: z.boolean().optional()
 });
 
 const EnrichCompanyInput = z.object({
@@ -97,7 +99,9 @@ const BulkEnrichPeopleInput = z.object({
     linkedin_url: z.string().url().optional(),
     name: z.string().optional(),
     company: z.string().optional()
-  }))
+  })),
+  reveal_personal_emails: z.boolean().optional(),
+  reveal_phone_number: z.boolean().optional()
 });
 
 const BulkEnrichOrganizationsInput = z.object({
@@ -398,14 +402,20 @@ server.registerTool(
       email: z.string().email().optional(),
       linkedin_url: z.string().url().optional(),
       name: z.string().optional(),
-      company: z.string().optional()
+      company: z.string().optional(),
+      reveal_personal_emails: z.boolean().optional().describe("Reveal personal emails (default: false)"),
+      reveal_phone_number: z.boolean().optional().describe("Reveal phone numbers (default: false)")
     }
   },
   async (args: any) => {
     try {
       const parsed = EnrichPersonInput.parse(args || {});
-      const body: Record<string, unknown> = { ...parsed };
-      const json = await apollo.matchPerson(body);
+      const { reveal_personal_emails, reveal_phone_number, ...body } = parsed;
+      const json = await apollo.matchPerson(
+        body,
+        reveal_personal_emails ?? false,
+        reveal_phone_number ?? false
+      );
       return { content: [{ type: "text", text: JSON.stringify(json, null, 2) }] };
     } catch (error) {
       return {
@@ -460,13 +470,20 @@ server.registerTool(
         linkedin_url: z.string().url().optional(),
         name: z.string().optional(),
         company: z.string().optional()
-      }))
+      })),
+      reveal_personal_emails: z.boolean().optional().describe("Reveal personal emails (default: false)"),
+      reveal_phone_number: z.boolean().optional().describe("Reveal phone numbers (default: false)")
     }
   },
   async (args: any) => {
     try {
       const parsed = BulkEnrichPeopleInput.parse(args || {});
-      const json = await apollo.bulkEnrichPeople(parsed);
+      const { reveal_personal_emails, reveal_phone_number, ...body } = parsed;
+      const json = await apollo.bulkEnrichPeople(
+        body,
+        reveal_personal_emails ?? false,
+        reveal_phone_number ?? false
+      );
       return { content: [{ type: "text", text: JSON.stringify(json, null, 2) }] };
     } catch (error) {
       return {

@@ -75,9 +75,9 @@ export class ApolloClient {
     return (await res.body.json()) as T;
   }
 
-  // People search - using mixed_people/search
+  // People search - using mixed_people/api_search (updated endpoint)
   searchPeople(params: Record<string, unknown>) {
-    return this.post("/mixed_people/search", params);
+    return this.post("/mixed_people/api_search", params);
   }
 
   // Company/Organization search - using mixed_companies/search
@@ -86,10 +86,10 @@ export class ApolloClient {
   }
 
   // Enrich person (match) - using people/match with query params
-  matchPerson(params: Record<string, unknown>) {
+  matchPerson(params: Record<string, unknown>, revealPersonalEmails: boolean = false, revealPhoneNumber: boolean = false) {
     const queryParams = new URLSearchParams({
-      reveal_personal_emails: 'false',
-      reveal_phone_number: 'false'
+      reveal_personal_emails: revealPersonalEmails.toString(),
+      reveal_phone_number: revealPhoneNumber.toString()
     });
     return this.post(`/people/match?${queryParams}`, params);
   }
@@ -100,10 +100,10 @@ export class ApolloClient {
   }
 
   // Bulk People Enrichment - using people/bulk_match with query params
-  bulkEnrichPeople(params: Record<string, unknown>) {
+  bulkEnrichPeople(params: Record<string, unknown>, revealPersonalEmails: boolean = false, revealPhoneNumber: boolean = false) {
     const queryParams = new URLSearchParams({
-      reveal_personal_emails: 'false',
-      reveal_phone_number: 'false'
+      reveal_personal_emails: revealPersonalEmails.toString(),
+      reveal_phone_number: revealPhoneNumber.toString()
     });
     return this.post(`/people/bulk_match?${queryParams}`, params);
   }
