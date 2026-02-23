@@ -41,6 +41,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run src/__tests__/integration.test.ts",
+    "test:unit": "vitest run --exclude src/__tests__/integration.test.ts",
     "inspector": "npx @modelcontextprotocol/inspector --config mcp-inspector.json",
     "inspector:cli": "npx @modelcontextprotocol/inspector --cli --config mcp-inspector.json --server apollo",
     "prepublishOnly": "npm run build && npm test",
