@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { ApolloClient } from '../apollo.js';
 import * as fixtures from './fixtures/apollo-responses.js';
@@ -9,7 +10,8 @@ import * as fixtures from './fixtures/apollo-responses.js';
  * or skip gracefully if not available.
  *
  * Run with: npm run test:integration
- * Set API key: export APOLLO_API_KEY=your_key_here
+ * Set API key in .env file: APOLLO_API_KEY=your_key_here
+ * Or export: export APOLLO_API_KEY=your_key_here
  */
 
 const hasApiKey = !!process.env.APOLLO_API_KEY;
