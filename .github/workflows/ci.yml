@@ -169,13 +169,7 @@ jobs:
       - name: Enable auto-merge for patch and minor updates
         if: steps.check.outputs.is_dependabot == 'true' && (steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor')
         run: |
-          if [ -n "$DEPENDABOT_PAT" ]; then
-            gh pr merge --auto --squash "$PR_URL" && echo "✅ Auto-merge enabled"
-          else
-            echo "⚠️  DEPENDABOT_PAT not set - auto-merge requires manual approval"
-          fi
+          gh pr merge --auto --squash "$PR_URL" && echo "✅ Auto-merge enabled"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT || secrets.GITHUB_TOKEN }}
-          DEPENDABOT_PAT: ${{ secrets.DEPENDABOT_PAT }}
-        continue-on-error: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
