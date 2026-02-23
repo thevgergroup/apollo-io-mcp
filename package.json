@@ -41,6 +41,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:unit": "vitest run --exclude src/__tests__/integration.test.ts",
     "inspector": "npx @modelcontextprotocol/inspector --config mcp-inspector.json",
     "inspector:cli": "npx @modelcontextprotocol/inspector --cli --config mcp-inspector.json --server apollo",
     "prepublishOnly": "npm run build && npm test",
@@ -55,7 +57,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@modelcontextprotocol/inspector": "^0.16.8",
+    "@modelcontextprotocol/inspector": "^0.20.0",
     "@types/node": "^24.5.2",
     "@vitest/coverage-v8": "^4.0.18",
     "tsx": "^4.19.1",
