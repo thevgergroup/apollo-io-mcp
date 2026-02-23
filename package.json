@@ -57,10 +57,10 @@
   "devDependencies": {
     "@modelcontextprotocol/inspector": "^0.16.8",
     "@types/node": "^24.5.2",
-    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/coverage-v8": "^4.0.18",
     "tsx": "^4.19.1",
     "typescript": "^5.5.4",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.18"
   },
   "files": [
     "dist",

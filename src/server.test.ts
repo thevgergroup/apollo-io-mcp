@@ -3,12 +3,14 @@ import { z } from 'zod';
 
 // Mock the Apollo client
 vi.mock('./apollo.js', () => ({
-  ApolloClient: vi.fn().mockImplementation(() => ({
-    searchPeople: vi.fn(),
-    searchCompanies: vi.fn(),
-    matchPerson: vi.fn(),
-    matchCompany: vi.fn()
-  }))
+  ApolloClient: vi.fn(function() {
+    return {
+      searchPeople: vi.fn(),
+      searchCompanies: vi.fn(),
+      matchPerson: vi.fn(),
+      matchCompany: vi.fn()
+    };
+  })
 }));
 
 // Mock dotenv
@@ -16,16 +18,18 @@ vi.mock('dotenv/config', () => ({}));
 
 // Mock MCP SDK
 vi.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
-  Server: vi.fn().mockImplementation(() => ({
-    tool: vi.fn(),
-    router: {
-      callTool: vi.fn()
-    },
-    defaultCallTool: vi.fn(),
-    connect: vi.fn()
-  })),
-  StdioServerTransport: vi.fn(),
-  Tool: vi.fn()
+  Server: vi.fn(function() {
+    return {
+      tool: vi.fn(),
+      router: {
+        callTool: vi.fn()
+      },
+      defaultCallTool: vi.fn(),
+      connect: vi.fn()
+    };
+  }),
+  StdioServerTransport: vi.fn(function() { return {}; }),
+  Tool: vi.fn(function() { return {}; })
 }));
 
 vi.mock('@modelcontextprotocol/sdk/types.js', () => ({
