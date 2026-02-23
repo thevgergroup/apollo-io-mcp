@@ -40,8 +40,8 @@ describeIntegration('Apollo.io Integration Tests', () => {
 
       expect(response).toBeDefined();
       expect(response.people).toBeInstanceOf(Array);
-      // API response structure may vary - just verify we got results
-      expect(response.people.length).toBeGreaterThan(0);
+      expect(response.pagination).toBeDefined();
+      expect(response.pagination.page).toBe(1);
     });
 
     it('should search people with filters', async () => {
@@ -56,7 +56,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
       expect(response.people).toBeInstanceOf(Array);
     });
 
-    it('should handle queries gracefully', async () => {
+    it('should handle empty results', async () => {
       const response = await client.searchPeople({
         q: 'xyzinvalidquery12345nonexistent',
         page: 1,
@@ -65,8 +65,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
 
       expect(response).toBeDefined();
       expect(response.people).toBeInstanceOf(Array);
-      // Apollo may return some results even for unusual queries
-      // The important thing is it doesn't error
+      expect(response.people.length).toBe(0);
     });
   });
 
