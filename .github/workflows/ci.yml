@@ -138,20 +138,29 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Auto-approve patch and minor updates
-        if: |
-          (steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-           steps.metadata.outputs.update-type == 'version-update:semver-minor') &&
-          secrets.DEPENDABOT_PAT != ''
-        run: gh pr review --approve "$PR_URL"
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: |
+          if [ -n "$DEPENDABOT_PAT" ]; then
+            gh pr review --approve "$PR_URL" && echo "✅ PR approved"
+          else
+            echo "⚠️  DEPENDABOT_PAT not set - skipping auto-approval"
+          fi
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT }}
+          DEPENDABOT_PAT: ${{ secrets.DEPENDABOT_PAT }}
         continue-on-error: true
 
       - name: Enable auto-merge for patch and minor updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: |
+          if [ -n "$DEPENDABOT_PAT" ]; then
+            gh pr merge --auto --squash "$PR_URL" && echo "✅ Auto-merge enabled"
+          else
+            echo "⚠️  DEPENDABOT_PAT not set - auto-merge requires manual approval"
+          fi
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT || secrets.GITHUB_TOKEN }}
+          DEPENDABOT_PAT: ${{ secrets.DEPENDABOT_PAT }}
         continue-on-error: true
