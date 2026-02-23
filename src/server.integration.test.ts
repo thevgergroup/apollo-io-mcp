@@ -3,17 +3,19 @@ import { ApolloClient } from './apollo.js';
 
 // Mock the ApolloClient
 vi.mock('./apollo.js', () => ({
-  ApolloClient: vi.fn().mockImplementation(() => ({
-    searchPeople: vi.fn(),
-    searchCompanies: vi.fn(),
-    matchPerson: vi.fn(),
-    matchCompany: vi.fn(),
-    bulkEnrichPeople: vi.fn(),
-    bulkEnrichOrganizations: vi.fn(),
-    getOrganizationJobPostings: vi.fn(),
-    getCompleteOrganizationInfo: vi.fn(),
-    searchNewsArticles: vi.fn()
-  }))
+  ApolloClient: vi.fn(function() {
+    return {
+      searchPeople: vi.fn(),
+      searchCompanies: vi.fn(),
+      matchPerson: vi.fn(),
+      matchCompany: vi.fn(),
+      bulkEnrichPeople: vi.fn(),
+      bulkEnrichOrganizations: vi.fn(),
+      getOrganizationJobPostings: vi.fn(),
+      getCompleteOrganizationInfo: vi.fn(),
+      searchNewsArticles: vi.fn()
+    };
+  })
 }));
 
 describe('Apollo MCP Server Integration Tests', () => {
