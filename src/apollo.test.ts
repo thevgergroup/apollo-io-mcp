@@ -35,7 +35,7 @@ describe('ApolloClient', () => {
   });
 
   describe('searchPeople', () => {
-    it('should make POST request to /mixed_people/search', async () => {
+    it('should make POST request to /mixed_people/api_search', async () => {
       const mockResponse = {
         statusCode: 200,
         body: {
@@ -48,7 +48,7 @@ describe('ApolloClient', () => {
       await client.searchPeople(params);
 
       expect(mockRequest).toHaveBeenCalledWith(
-        'https://api.apollo.io/api/v1/mixed_people/search',
+        'https://api.apollo.io/api/v1/mixed_people/api_search',
         {
           method: 'POST',
           headers: {
@@ -139,7 +139,7 @@ describe('ApolloClient', () => {
   });
 
   describe('matchPerson', () => {
-    it('should make POST request to /people/match with query params', async () => {
+    it('should make POST request to /people/match with default query params', async () => {
       const mockResponse = {
         statusCode: 200,
         body: {
@@ -153,6 +153,31 @@ describe('ApolloClient', () => {
 
       expect(mockRequest).toHaveBeenCalledWith(
         'https://api.apollo.io/api/v1/people/match?reveal_personal_emails=false&reveal_phone_number=false',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': 'test-api-key'
+          },
+          body: JSON.stringify(params)
+        }
+      );
+    });
+
+    it('should support reveal parameters', async () => {
+      const mockResponse = {
+        statusCode: 200,
+        body: {
+          json: vi.fn().mockResolvedValue({ person: {} })
+        }
+      };
+      mockRequest.mockResolvedValue(mockResponse as any);
+
+      const params = { email: 'test@example.com' };
+      await client.matchPerson(params, true, true);
+
+      expect(mockRequest).toHaveBeenCalledWith(
+        'https://api.apollo.io/api/v1/people/match?reveal_personal_emails=true&reveal_phone_number=true',
         {
           method: 'POST',
           headers: {
