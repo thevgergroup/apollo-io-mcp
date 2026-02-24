@@ -7,24 +7,33 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const serverPath = path.join(__dirname, '..', 'dist', 'server.js');
+const files = ['server.js', 'cli.js'];
 
-// Read the current content
-const content = fs.readFileSync(serverPath, 'utf8');
+for (const file of files) {
+  const filePath = path.join(__dirname, '..', 'dist', file);
 
-// Add shebang if it doesn't exist
-if (!content.startsWith('#!/usr/bin/env node')) {
-  const newContent = `#!/usr/bin/env node
+  // Skip if file doesn't exist
+  if (!fs.existsSync(filePath)) {
+    continue;
+  }
+
+  // Read the current content
+  const content = fs.readFileSync(filePath, 'utf8');
+
+  // Add shebang if it doesn't exist
+  if (!content.startsWith('#!/usr/bin/env node')) {
+    const newContent = `#!/usr/bin/env node
 
 ${content}`;
-  fs.writeFileSync(serverPath, newContent);
-  console.log('Added shebang to dist/server.js');
-}
+    fs.writeFileSync(filePath, newContent);
+    console.log(`Added shebang to dist/${file}`);
+  }
 
-// Make the file executable
-try {
-  fs.chmodSync(serverPath, 0o755);
-  console.log('Made dist/server.js executable');
-} catch (error) {
-  console.error('Failed to make file executable:', error);
+  // Make the file executable
+  try {
+    fs.chmodSync(filePath, 0o755);
+    console.log(`Made dist/${file} executable`);
+  } catch (error) {
+    console.error(`Failed to make ${file} executable:`, error);
+  }
 }
