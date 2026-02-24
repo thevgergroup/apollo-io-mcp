@@ -73,14 +73,19 @@ The package includes a powerful command-line interface for direct API access:
 # Install globally
 npm install -g @thevgergroup/apollo-io-mcp
 
-# Or use with npx
-npx @thevgergroup/apollo-io-mcp search-people --q "Software Engineer"
+# Search for people (person_titles required)
+apollo-io-cli search-people --person_titles "Manager,Director" --person_locations "Virginia"
 
-# Examples
+# Find specific person by name (enrichment)
+apollo-io-cli enrich-person --first_name "John" --last_name "Doe" --organization_name "Company"
+
+# Other examples
 apollo-io-cli enrich-person --email "tim@apollo.io"
 apollo-io-cli search-companies --q "technology" --organization_num_employees_ranges "51,200"
 apollo-io-cli org-jobs --id "5e66b6381e05b4008c8331b8"
 ```
+
+**Important:** People search requires `--person_titles`. To find someone by name, use enrichment instead.
 
 **See [CLI.md](./CLI.md) for complete CLI documentation, examples, and usage guide.**
 

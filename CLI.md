@@ -50,18 +50,28 @@ APOLLO_API_KEY=your_api_key_here
 
 Search for people based on various criteria.
 
-**Important:** The `--q` parameter must be used with at least one filter parameter (like `--person_titles`, `--person_locations`, etc.) for accurate results. Using `--q` alone will return default results from the database.
+**IMPORTANT:** `--person_titles` is **REQUIRED**. The Apollo API requires job titles to search for people. This endpoint is designed for prospecting people with active employment, not for finding specific individuals by name.
+
+**To find a specific person by name** (like a friend or colleague), use the enrichment endpoint instead:
+```bash
+apollo-io-cli enrich-person --first_name "John" --last_name "Doe" --organization_name "Company"
+```
+
+**Search examples:**
 
 ```bash
-# Search with filters (RECOMMENDED)
+# Basic search with required titles
+apollo-io-cli search-people --person_titles "CTO,VP Engineering"
+
+# Search with titles and location filter
 apollo-io-cli search-people \
-  --q "engineering" \
-  --person_titles "CTO,VP Engineering"
+  --person_titles "Manager,Director" \
+  --person_locations "Virginia"
 
 # Search with multiple filters
 apollo-io-cli search-people \
   --person_titles "CEO,CTO" \
-  --person_locations "San Francisco,CA,USA" \
+  --person_locations "San Francisco,CA" \
   --seniority "C-Level"
 
 # Single values work too (automatically converted to arrays)
@@ -275,18 +285,40 @@ apollo-io-cli search-people --person_titles "CTO"
 apollo-io-cli search-people --person_titles "CTO,VP Engineering"
 ```
 
-### Search Returns Same Results Every Time
+### "person_titles is required" Error
 
-If you're using `--q` alone without any filter parameters, the Apollo API will ignore it and return default results. Always combine `--q` with at least one filter:
+The Apollo API **requires** `--person_titles` for people search. This endpoint is designed for prospecting employed people, not finding specific individuals by name.
 
 ```bash
-# ❌ Bad - returns default results
-apollo-io-cli search-people --q "CEO"
+# ❌ Bad - missing required parameter
+apollo-io-cli search-people --person_locations "Virginia"
 
-# ✅ Good - returns filtered results
-apollo-io-cli search-people --q "CEO" --person_titles "CEO"
-apollo-io-cli search-people --person_titles "CEO" --person_locations "California"
+# ✅ Good - includes required person_titles
+apollo-io-cli search-people --person_titles "Manager,Director" --person_locations "Virginia"
 ```
+
+**To find someone by name without knowing their job title**, use enrichment:
+```bash
+apollo-io-cli enrich-person --first_name "John" --last_name "Doe" --organization_name "Company"
+```
+
+### Search Returns Default Results / Unrecognized Parameters
+
+If you use invalid or misspelled parameter names, they'll be silently ignored and you'll get default results:
+
+```bash
+# ❌ Bad - person_location is missing the 's'
+apollo-io-cli search-people --person_titles "CEO" --person_location "Virginia"
+# Warning: Unrecognized parameter(s): --person_location
+
+# ✅ Good - correct parameter name
+apollo-io-cli search-people --person_titles "CEO" --person_locations "Virginia"
+```
+
+**Common typos:**
+- `--person_location` → should be `--person_locations` (plural)
+- `--person_title` → should be `--person_titles` (plural)
+- `--location` → should be `--person_locations`
 
 ### Array Fields Reference
 

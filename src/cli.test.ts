@@ -60,11 +60,12 @@ describe('CLI Tool', () => {
     it('should display command-specific help for search-people', () => {
       const output = execSync(`node ${CLI_PATH} search-people --help`, { encoding: 'utf8' });
 
-      expect(output).toContain('search-people [options]');
-      expect(output).toContain('Common Filter Options');
+      expect(output).toContain('search-people --person_titles');
+      expect(output).toContain('REQUIRED');
       expect(output).toContain('--person_titles');
       expect(output).toContain('--person_locations');
       expect(output).toContain('--seniority');
+      expect(output).toContain('enrich-person'); // Should mention enrichment alternative
     });
 
     it('should display command-specific help for search-companies', () => {
@@ -91,7 +92,7 @@ describe('CLI Tool', () => {
       delete envWithoutKey.APOLLO_API_KEY;
 
       try {
-        execSync(`node ${CLI_PATH} search-people --q "test"`, {
+        execSync(`node ${CLI_PATH} search-people --person_titles "Manager" --q "test"`, {
           encoding: 'utf8',
           env: envWithoutKey,
           stdio: 'pipe'
@@ -116,6 +117,40 @@ describe('CLI Tool', () => {
         expect.fail('Should have thrown an error');
       } catch (error: any) {
         expect(error.stderr || error.stdout).toContain('Invalid command');
+      }
+    });
+
+    it('should error when person_titles is missing for search-people', () => {
+      process.env.APOLLO_API_KEY = 'test-key';
+
+      try {
+        execSync(`node ${CLI_PATH} search-people --person_locations "Virginia"`, {
+          encoding: 'utf8',
+          env: process.env,
+          stdio: 'pipe'
+        });
+        expect.fail('Should have thrown an error');
+      } catch (error: any) {
+        const output = error.stderr || error.stdout || error.message;
+        expect(output).toContain('person_titles is required');
+        expect(output).toContain('enrich-person'); // Should suggest enrichment
+      }
+    });
+
+    it('should warn about unrecognized parameters', () => {
+      process.env.APOLLO_API_KEY = 'test-key';
+
+      try {
+        execSync(`node ${CLI_PATH} search-people --person_titles "Manager" --person_location "Virginia"`, {
+          encoding: 'utf8',
+          env: process.env,
+          stdio: 'pipe',
+          timeout: 5000
+        });
+      } catch (error: any) {
+        const output = error.stderr || error.stdout || error.message;
+        expect(output).toContain('Unrecognized parameter');
+        expect(output).toContain('person_location');
       }
     });
   });

@@ -66,14 +66,20 @@ function printCommandHelp(command: CommandName) {
   switch (command) {
     case 'search-people':
       console.log(`
-apollo-io-cli search-people [options]
+apollo-io-cli search-people --person_titles <titles> [options]
 
 Search for people in Apollo's database with advanced filtering.
 
-IMPORTANT: The --q parameter must be used with at least one filter for accurate results.
+IMPORTANT: --person_titles is REQUIRED. The Apollo API requires job titles to search.
+This endpoint is designed for prospecting people with active employment.
 
-Common Filter Options:
+To find a specific person by name without a job title, use enrichment:
+  apollo-io-cli enrich-person --first_name "John" --last_name "Doe"
+
+Required:
   --person_titles <titles>         Job titles (e.g., "CTO" or "CEO,CTO,VP Engineering")
+
+Optional Filter Options:
   --person_locations <locations>   Locations (e.g., "San Francisco,CA" or "New York")
   --seniority <levels>            Seniority levels (e.g., "C-Level,VP,Director")
   --departments <depts>           Departments (e.g., "Engineering,Sales,Marketing")
@@ -405,18 +411,40 @@ async function runCommand(client: ApolloClient, command: CommandName, params: Re
 
     switch (command) {
       case 'search-people':
-        // Warn if using --q without any filter parameters
-        const hasFilter = Object.keys(params).some(key =>
-          ARRAY_FIELDS.has(key) || ['q_organization_domains', 'contact_email_status'].includes(key)
-        );
-        if (params.q && !hasFilter) {
-          console.error('Warning: The --q parameter alone will return default results.');
-          console.error('For better results, combine --q with filters like:');
-          console.error('  --person_titles, --person_locations, --seniority, --departments, etc.');
+        // Validate required parameter: person_titles
+        if (!params.person_titles) {
+          console.error('Error: --person_titles is required for search-people');
           console.error('');
-          console.error('Example: apollo-io-cli search-people --q "engineering" --person_titles "CTO"');
+          console.error('The Apollo API requires job titles to search for people.');
+          console.error('');
+          console.error('Examples:');
+          console.error('  apollo-io-cli search-people --person_titles "CEO,CTO"');
+          console.error('  apollo-io-cli search-people --person_titles "Manager" --person_locations "Virginia"');
+          console.error('');
+          console.error('To find a specific person by name, use enrichment instead:');
+          console.error('  apollo-io-cli enrich-person --first_name "John" --last_name "Doe" --organization_name "Company"');
+          console.error('');
+          console.error('For help: apollo-io-cli search-people --help');
+          process.exit(1);
+        }
+
+        // Warn about unrecognized parameters
+        const validSearchPeopleParams = new Set([
+          'person_titles', 'person_locations', 'person_seniorities', 'seniority',
+          'departments', 'industries', 'technologies', 'company_domains',
+          'q_organization_domains', 'contact_email_status', 'years_of_experience',
+          'education_degrees', 'education_schools', 'q', 'page', 'per_page',
+          'q_keywords', 'organization_locations', 'organization_ids',
+          'organization_num_employees_ranges', 'revenue_range'
+        ]);
+
+        const unrecognizedParams = Object.keys(params).filter(key => !validSearchPeopleParams.has(key));
+        if (unrecognizedParams.length > 0) {
+          console.error(`Warning: Unrecognized parameter(s): ${unrecognizedParams.map(p => '--' + p).join(', ')}`);
+          console.error('These parameters will be ignored. Run --help to see valid parameters.');
           console.error('');
         }
+
         result = await client.searchPeople(params);
         break;
 
