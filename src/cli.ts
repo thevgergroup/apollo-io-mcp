@@ -194,19 +194,21 @@ async function runCommand(client: ApolloClient, command: CommandName, params: Re
 }
 
 async function main() {
-  const apiKey = process.env.APOLLO_API_KEY;
-
-  if (!apiKey) {
-    console.error('Error: APOLLO_API_KEY environment variable is required');
-    console.error('Set it in a .env file or export APOLLO_API_KEY=your_key_here');
-    process.exit(1);
-  }
-
+  // Parse args first to handle --help before API key check
   const { command, params } = parseArgs(process.argv.slice(2));
 
   if (!command || !(command in COMMANDS)) {
     console.error(`Error: Invalid command "${command}"`);
     printUsage();
+    process.exit(1);
+  }
+
+  // Check for API key after parsing args (help exits before this)
+  const apiKey = process.env.APOLLO_API_KEY;
+
+  if (!apiKey) {
+    console.error('Error: APOLLO_API_KEY environment variable is required');
+    console.error('Set it in a .env file or export APOLLO_API_KEY=your_key_here');
     process.exit(1);
   }
 
