@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import { ApolloClient } from './apollo.js';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
+const VERSION = packageJson.version;
 
 const COMMANDS = {
   'search-people': 'Search for people',
@@ -18,7 +23,7 @@ type CommandName = keyof typeof COMMANDS;
 
 function printUsage() {
   console.log(`
-Apollo.io CLI Tool
+Apollo.io CLI Tool v${VERSION}
 
 Usage: apollo-io-cli <command> [options]
 
@@ -307,6 +312,12 @@ const ARRAY_FIELDS = new Set([
 ]);
 
 function parseArgs(args: string[]): { command?: CommandName; params: Record<string, any> } {
+  // Handle --version or -v
+  if (args.length > 0 && (args[0] === '--version' || args[0] === '-v')) {
+    console.log(VERSION);
+    process.exit(0);
+  }
+
   if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
     printUsage();
     process.exit(0);

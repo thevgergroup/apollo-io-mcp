@@ -20,6 +20,19 @@ describe('CLI Tool', () => {
   });
 
   describe('Help and Usage', () => {
+    it('should display version with --version flag', () => {
+      const output = execSync(`node ${CLI_PATH} --version`, { encoding: 'utf8' });
+
+      // Should match semver pattern (e.g., 2.1.0)
+      expect(output.trim()).toMatch(/^\d+\.\d+\.\d+$/);
+    });
+
+    it('should display version with -v flag', () => {
+      const output = execSync(`node ${CLI_PATH} -v`, { encoding: 'utf8' });
+
+      expect(output.trim()).toMatch(/^\d+\.\d+\.\d+$/);
+    });
+
     it('should display help with --help flag', () => {
       const output = execSync(`node ${CLI_PATH} --help`, { encoding: 'utf8' });
 
@@ -34,6 +47,8 @@ describe('CLI Tool', () => {
       const output = execSync(`node ${CLI_PATH} -h`, { encoding: 'utf8' });
 
       expect(output).toContain('Apollo.io CLI Tool');
+      // Should also show version in help
+      expect(output).toMatch(/Apollo\.io CLI Tool v\d+\.\d+\.\d+/);
     });
 
     it('should display help with no arguments', () => {
