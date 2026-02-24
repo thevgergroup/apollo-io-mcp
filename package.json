@@ -15,7 +15,8 @@
   "type": "module",
   "main": "dist/server.js",
   "bin": {
-    "apollo-io-mcp": "dist/server.js"
+    "apollo-io-mcp": "dist/server.js",
+    "apollo-io-cli": "dist/cli.js"
   },
   "repository": {
     "type": "git",

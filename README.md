@@ -1,11 +1,17 @@
-# Apollo.io MCP Server
+# Apollo.io MCP Server & CLI
 
 ![Apollo.io MCP Server](https://github.com/thevgergroup/apollo-io-mcp/raw/main/docs/apollo_logo_social.jpg)
 
-A Model Context Protocol (MCP) server for Apollo.io that integrates with Claude Desktop. This server provides access to Apollo's comprehensive B2B database for people and company search, enrichment, and insights.
+A Model Context Protocol (MCP) server and command-line interface for Apollo.io. This package provides:
 
-- [Apollo.io MCP Server](#apolloio-mcp-server)
+- **MCP Server**: Integrates Apollo.io with Claude Desktop for conversational access to B2B data
+- **CLI Tool**: Command-line interface for direct API access via terminal
+
+Both tools provide access to Apollo's comprehensive B2B database for people and company search, enrichment, and insights.
+
+- [Apollo.io MCP Server \& CLI](#apolloio-mcp-server--cli)
   - [Features](#features)
+  - [CLI Tool](#cli-tool)
   - [Claude Desktop Setup](#claude-desktop-setup)
     - [Step 1: Get Your Apollo API Key](#step-1-get-your-apollo-api-key)
     - [Step 2: Configure Claude Desktop](#step-2-configure-claude-desktop)
@@ -56,6 +62,27 @@ A Model Context Protocol (MCP) server for Apollo.io that integrates with Claude 
 - **Apollo Org and People Search** covering all major Apollo.io API endpoints
 - **Claude Desktop optimized** Simple ICP discovery
 - **Advanced filtering** with Apollo.io API parameter mapping
+- **CLI Tool** for command-line access to Apollo.io API
+- **TypeScript SDK** for programmatic access
+
+## CLI Tool
+
+The package includes a powerful command-line interface for direct API access:
+
+```bash
+# Install globally
+npm install -g @thevgergroup/apollo-io-mcp
+
+# Or use with npx
+npx @thevgergroup/apollo-io-mcp search-people --q "Software Engineer"
+
+# Examples
+apollo-io-cli enrich-person --email "tim@apollo.io"
+apollo-io-cli search-companies --q "technology" --organization_num_employees_ranges "51,200"
+apollo-io-cli org-jobs --id "5e66b6381e05b4008c8331b8"
+```
+
+**See [CLI.md](./CLI.md) for complete CLI documentation, examples, and usage guide.**
 
 ## Claude Desktop Setup
 
