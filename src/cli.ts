@@ -55,6 +55,24 @@ For JSON input, use --json '{"key": "value"}'
 `);
 }
 
+// Fields that must always be arrays per Apollo API requirements
+const ARRAY_FIELDS = new Set([
+  // People search array fields
+  'person_titles', 'seniority', 'departments', 'industries',
+  'technologies', 'company_domains', 'person_locations',
+  'contact_email_status', 'years_of_experience',
+  'education_degrees', 'education_schools',
+
+  // Company search array fields
+  'organization_locations', 'organization_not_locations',
+  'q_organization_keyword_tags', 'organization_num_employees_ranges',
+  'currently_using_any_of_technology_uids', 'organization_ids',
+  'q_organization_job_titles',
+
+  // Common array fields
+  'locations'
+]);
+
 function parseArgs(args: string[]): { command?: CommandName; params: Record<string, any> } {
   if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
     printUsage();
@@ -99,6 +117,13 @@ function parseArgs(args: string[]): { command?: CommandName; params: Record<stri
     }
   }
 
+  // Convert known array fields to arrays if they're not already
+  for (const key of Object.keys(params)) {
+    if (ARRAY_FIELDS.has(key) && !Array.isArray(params[key])) {
+      params[key] = [params[key]];
+    }
+  }
+
   return { command, params };
 }
 
@@ -126,6 +151,18 @@ async function runCommand(client: ApolloClient, command: CommandName, params: Re
 
     switch (command) {
       case 'search-people':
+        // Warn if using --q without any filter parameters
+        const hasFilter = Object.keys(params).some(key =>
+          ARRAY_FIELDS.has(key) || ['q_organization_domains', 'contact_email_status'].includes(key)
+        );
+        if (params.q && !hasFilter) {
+          console.error('Warning: The --q parameter alone will return default results.');
+          console.error('For better results, combine --q with filters like:');
+          console.error('  --person_titles, --person_locations, --seniority, --departments, etc.');
+          console.error('');
+          console.error('Example: apollo-io-cli search-people --q "engineering" --person_titles "CTO"');
+          console.error('');
+        }
         result = await client.searchPeople(params);
         break;
 

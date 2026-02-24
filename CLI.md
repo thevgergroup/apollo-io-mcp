@@ -50,15 +50,22 @@ APOLLO_API_KEY=your_api_key_here
 
 Search for people based on various criteria.
 
-```bash
-# Basic search
-apollo-io-cli search-people --q "Software Engineer" --page 1
+**Important:** The `--q` parameter must be used with at least one filter parameter (like `--person_titles`, `--person_locations`, etc.) for accurate results. Using `--q` alone will return default results from the database.
 
-# Search with filters
+```bash
+# Search with filters (RECOMMENDED)
 apollo-io-cli search-people \
-  --person_titles "CEO,CTO,VP Engineering" \
-  --q_organization_domains "google.com,microsoft.com" \
-  --person_locations "San Francisco,CA,USA"
+  --q "engineering" \
+  --person_titles "CTO,VP Engineering"
+
+# Search with multiple filters
+apollo-io-cli search-people \
+  --person_titles "CEO,CTO" \
+  --person_locations "San Francisco,CA,USA" \
+  --seniority "C-Level"
+
+# Single values work too (automatically converted to arrays)
+apollo-io-cli search-people --person_titles "CTO" --per_page 10
 
 # Using JSON input
 apollo-io-cli search-people --json '{
@@ -68,6 +75,15 @@ apollo-io-cli search-people --json '{
   "per_page": 10
 }'
 ```
+
+**Available filter parameters:**
+- `--person_titles` - Job titles (e.g., "CEO", "CTO,VP Engineering")
+- `--person_locations` - Locations (e.g., "San Francisco,CA", "New York")
+- `--seniority` - Seniority levels (e.g., "C-Level,VP")
+- `--departments` - Departments (e.g., "Engineering,Sales")
+- `--industries` - Industries (e.g., "Software,SaaS")
+- `--technologies` - Technologies (e.g., "python,react")
+- `--q_organization_domains` - Company domains (e.g., "google.com,microsoft.com")
 
 ### search-companies
 
@@ -244,6 +260,49 @@ Apollo.io enforces rate limits. If you hit a rate limit, the CLI will display:
 ```
 Error: Rate limited by Apollo (429). Retry after 60s.
 ```
+
+## Troubleshooting
+
+### "person_titles requires an array" Error
+
+If you see this error, it means you're passing a single value where an array is expected. As of v2.0.1+, this is handled automatically:
+
+```bash
+# This now works automatically
+apollo-io-cli search-people --person_titles "CTO"
+
+# Comma-separated values also work
+apollo-io-cli search-people --person_titles "CTO,VP Engineering"
+```
+
+### Search Returns Same Results Every Time
+
+If you're using `--q` alone without any filter parameters, the Apollo API will ignore it and return default results. Always combine `--q` with at least one filter:
+
+```bash
+# ❌ Bad - returns default results
+apollo-io-cli search-people --q "CEO"
+
+# ✅ Good - returns filtered results
+apollo-io-cli search-people --q "CEO" --person_titles "CEO"
+apollo-io-cli search-people --person_titles "CEO" --person_locations "California"
+```
+
+### Array Fields Reference
+
+The following fields are automatically converted to arrays (even for single values):
+
+**People search:**
+- `person_titles`, `seniority`, `departments`, `industries`
+- `technologies`, `company_domains`, `person_locations`
+- `contact_email_status`, `years_of_experience`
+- `education_degrees`, `education_schools`
+
+**Company search:**
+- `organization_locations`, `organization_not_locations`
+- `q_organization_keyword_tags`, `organization_num_employees_ranges`
+- `currently_using_any_of_technology_uids`, `organization_ids`
+- `q_organization_job_titles`
 
 ## Support
 

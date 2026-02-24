@@ -230,6 +230,21 @@ describe('CLI Tool', () => {
         expect(output).not.toContain('Invalid command');
       }
     });
+
+    it('should auto-convert single values to arrays for array fields', () => {
+      try {
+        execSync(`node ${CLI_PATH} search-people --person_titles "CTO"`, {
+          encoding: 'utf8',
+          env: process.env,
+          timeout: 5000
+        });
+      } catch (error: any) {
+        const output = error.stderr || error.stdout || error.message;
+        // Should not get "requires an array" error
+        expect(output).not.toContain('requires an array');
+        expect(output).not.toContain('Invalid command');
+      }
+    });
   });
 
   describe('Value Parsing', () => {
