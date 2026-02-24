@@ -52,7 +52,240 @@ Examples:
 Options are passed as --key value or --key=value
 For arrays, use comma-separated values: --titles "CEO,CTO,VP"
 For JSON input, use --json '{"key": "value"}'
+
+For command-specific help: apollo-io-cli <command> --help
 `);
+}
+
+function printCommandHelp(command: CommandName) {
+  switch (command) {
+    case 'search-people':
+      console.log(`
+apollo-io-cli search-people [options]
+
+Search for people in Apollo's database with advanced filtering.
+
+IMPORTANT: The --q parameter must be used with at least one filter for accurate results.
+
+Common Filter Options:
+  --person_titles <titles>         Job titles (e.g., "CTO" or "CEO,CTO,VP Engineering")
+  --person_locations <locations>   Locations (e.g., "San Francisco,CA" or "New York")
+  --seniority <levels>            Seniority levels (e.g., "C-Level,VP,Director")
+  --departments <depts>           Departments (e.g., "Engineering,Sales,Marketing")
+  --industries <industries>       Industries (e.g., "Software,SaaS,Healthcare")
+  --technologies <tech>           Technologies (e.g., "python,react,salesforce")
+  --company_domains <domains>     Company domains (e.g., "google.com,microsoft.com")
+  --q <query>                     Search query (combine with filters above)
+
+Pagination:
+  --page <number>                 Page number (default: 1)
+  --per_page <number>             Results per page (default: 25, max: 100)
+
+Examples:
+  # Search for CTOs in engineering
+  apollo-io-cli search-people --person_titles "CTO" --q "engineering"
+
+  # Search for executives in San Francisco
+  apollo-io-cli search-people --seniority "C-Level,VP" --person_locations "San Francisco,CA"
+
+  # Search for people at specific companies
+  apollo-io-cli search-people --company_domains "google.com,apple.com" --departments "Engineering"
+
+All filter values are automatically converted to arrays (commas optional for single values).
+`);
+      break;
+
+    case 'search-companies':
+      console.log(`
+apollo-io-cli search-companies [options]
+
+Search for companies/organizations in Apollo's database.
+
+Common Filter Options:
+  --organization_locations <loc>           Company locations (e.g., "California,New York")
+  --organization_not_locations <loc>       Exclude locations
+  --q_organization_keyword_tags <tags>     Industry keywords (e.g., "edtech,saas,fintech")
+  --organization_num_employees_ranges <r>  Employee ranges (e.g., "11,20" or "51,200,201,500")
+  --currently_using_any_of_technology_uids Technologies used
+  --q <query>                              Search query
+
+Pagination:
+  --page <number>                          Page number (default: 1)
+  --per_page <number>                      Results per page (default: 25)
+
+Employee Range Format:
+  Use comma-separated min,max pairs: "11,20" means 11-20 employees
+  Multiple ranges: "11,20,21,50,51,100" searches three ranges
+
+Examples:
+  # Search for tech companies in California
+  apollo-io-cli search-companies --q_organization_keyword_tags "technology,saas" \\
+    --organization_locations "California"
+
+  # Search by employee count
+  apollo-io-cli search-companies --organization_num_employees_ranges "51,200" \\
+    --organization_locations "San Francisco,CA"
+
+  # Search with keyword
+  apollo-io-cli search-companies --q "education technology" \\
+    --q_organization_keyword_tags "edtech"
+`);
+      break;
+
+    case 'enrich-person':
+      console.log(`
+apollo-io-cli enrich-person [options]
+
+Enrich person data by email, LinkedIn URL, or name/company.
+
+Required (one of):
+  --email <email>              Person's email address
+  --linkedin_url <url>         LinkedIn profile URL
+  --first_name <name>          First name (requires --last_name and --organization_name)
+  --last_name <name>           Last name (requires --first_name)
+  --organization_name <name>   Company name (for name-based matching)
+
+Optional:
+  --reveal_personal_emails <bool>  Reveal personal emails (uses credits)
+  --reveal_phone_number <bool>     Reveal phone number (uses credits)
+
+Examples:
+  # Enrich by email
+  apollo-io-cli enrich-person --email "tim@apollo.io"
+
+  # Enrich by LinkedIn
+  apollo-io-cli enrich-person --linkedin_url "https://www.linkedin.com/in/tim-zheng"
+
+  # Enrich by name and company
+  apollo-io-cli enrich-person --first_name "Tim" --last_name "Zheng" \\
+    --organization_name "Apollo"
+
+  # With personal contact reveal (uses credits)
+  apollo-io-cli enrich-person --email "tim@apollo.io" \\
+    --reveal_personal_emails true --reveal_phone_number true
+`);
+      break;
+
+    case 'enrich-company':
+      console.log(`
+apollo-io-cli enrich-company [options]
+
+Enrich company data by domain or name.
+
+Required (one of):
+  --domain <domain>    Company domain (e.g., "apollo.io")
+  --name <name>        Company name (e.g., "Apollo.io")
+
+Examples:
+  # Enrich by domain
+  apollo-io-cli enrich-company --domain "apollo.io"
+
+  # Enrich by name
+  apollo-io-cli enrich-company --name "Apollo.io"
+`);
+      break;
+
+    case 'org-jobs':
+      console.log(`
+apollo-io-cli org-jobs --id <organization_id> [options]
+
+Get job postings for a specific organization.
+
+Required:
+  --id <id>           Apollo organization ID
+
+Optional:
+  --page <number>     Page number (default: 1)
+  --per_page <number> Results per page (default: 10)
+
+Example:
+  apollo-io-cli org-jobs --id "5e66b6381e05b4008c8331b8" --per_page 20
+`);
+      break;
+
+    case 'org-info':
+      console.log(`
+apollo-io-cli org-info --id <organization_id>
+
+Get complete information for a specific organization.
+
+Required:
+  --id <id>    Apollo organization ID
+
+Example:
+  apollo-io-cli org-info --id "5e66b6381e05b4008c8331b8"
+`);
+      break;
+
+    case 'bulk-enrich-people':
+      console.log(`
+apollo-io-cli bulk-enrich-people --json <json_data>
+
+Bulk enrich multiple people at once.
+
+Required:
+  --json <json>    JSON object with "details" array
+
+JSON Format:
+  {
+    "details": [
+      {"email": "person1@example.com"},
+      {"first_name": "John", "last_name": "Doe", "organization_name": "Company"}
+    ]
+  }
+
+Example:
+  apollo-io-cli bulk-enrich-people --json '{
+    "details": [
+      {"email": "tim@apollo.io"},
+      {"first_name": "Roy", "last_name": "Chung", "organization_name": "Apollo"}
+    ]
+  }'
+`);
+      break;
+
+    case 'bulk-enrich-companies':
+      console.log(`
+apollo-io-cli bulk-enrich-companies --json <json_data>
+
+Bulk enrich multiple companies at once.
+
+Required:
+  --json <json>    JSON object with "domains" array
+
+JSON Format:
+  {
+    "domains": ["company1.com", "company2.com", "company3.com"]
+  }
+
+Example:
+  apollo-io-cli bulk-enrich-companies --json '{
+    "domains": ["apollo.io", "salesforce.com", "hubspot.com"]
+  }'
+`);
+      break;
+
+    case 'search-news':
+      console.log(`
+apollo-io-cli search-news [options]
+
+Search for news articles.
+
+Options:
+  --q <query>                  Search query
+  --news_event_types <types>   Event types (e.g., "funding,acquisition")
+  --organization_ids <ids>     Organization IDs
+  --page <number>              Page number (default: 1)
+  --per_page <number>          Results per page (default: 10)
+
+Example:
+  apollo-io-cli search-news --q "Series A" --news_event_types "funding"
+`);
+      break;
+
+    default:
+      printUsage();
+  }
 }
 
 // Fields that must always be arrays per Apollo API requirements
@@ -80,6 +313,16 @@ function parseArgs(args: string[]): { command?: CommandName; params: Record<stri
   }
 
   const command = args[0] as CommandName;
+
+  // Check for command-specific help
+  if ((args.length > 1 && (args[1] === '--help' || args[1] === '-h')) ||
+      (args.length === 1 && command in COMMANDS)) {
+    if (args[1] === '--help' || args[1] === '-h') {
+      printCommandHelp(command);
+      process.exit(0);
+    }
+  }
+
   const params: Record<string, any> = {};
 
   for (let i = 1; i < args.length; i++) {

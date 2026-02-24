@@ -41,6 +41,33 @@ describe('CLI Tool', () => {
 
       expect(output).toContain('Apollo.io CLI Tool');
     });
+
+    it('should display command-specific help for search-people', () => {
+      const output = execSync(`node ${CLI_PATH} search-people --help`, { encoding: 'utf8' });
+
+      expect(output).toContain('search-people [options]');
+      expect(output).toContain('Common Filter Options');
+      expect(output).toContain('--person_titles');
+      expect(output).toContain('--person_locations');
+      expect(output).toContain('--seniority');
+    });
+
+    it('should display command-specific help for search-companies', () => {
+      const output = execSync(`node ${CLI_PATH} search-companies --help`, { encoding: 'utf8' });
+
+      expect(output).toContain('search-companies [options]');
+      expect(output).toContain('--organization_locations');
+      expect(output).toContain('Employee Range Format');
+    });
+
+    it('should display command-specific help for enrich-person', () => {
+      const output = execSync(`node ${CLI_PATH} enrich-person --help`, { encoding: 'utf8' });
+
+      expect(output).toContain('enrich-person [options]');
+      expect(output).toContain('--email');
+      expect(output).toContain('--linkedin_url');
+      expect(output).toContain('--reveal_personal_emails');
+    });
   });
 
   describe('Error Handling', () => {
