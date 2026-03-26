@@ -65,6 +65,9 @@
     "typescript": "^5.5.4",
     "vitest": "^4.0.18"
   },
+  "overrides": {
+    "minimatch": "^10.0.0"
+  },
   "files": [
     "dist",
     "README.md",
