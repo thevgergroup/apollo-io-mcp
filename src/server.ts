@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { ApolloClient } from "./apollo.js";
+import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody } from "./server.helpers.js";
 
 // ----- Config -----
 const apiKey = process.env.APOLLO_API_KEY;
@@ -355,22 +356,9 @@ server.registerTool(
       const result = await apollo.searchCompanies(body) as any;
 
       // Simplify the response for Claude Desktop
-      // Apollo returns companies in `organizations` when using q_organization_name,
-      // but in `accounts` for generic keyword queries. Fall back to accounts.
-      const companies = result.organizations?.length ? result.organizations : result.accounts;
-      const simplifiedCompanies = companies?.map((company: any) => ({
-        id: company.id,
-        name: company.name,
-        website: company.website_url,
-        industry: company.industry,
-        employee_count: company.employee_count,
-        location: company.raw_address || `${company.city || ''}, ${company.state || ''}, ${company.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, ''),
-        linkedin_url: company.linkedin_url,
-        founded_year: company.founded_year,
-        phone: company.phone,
-        revenue: company.organization_revenue_printed,
-        market_cap: company.market_cap
-      })) || [];
+      // Apollo returns companies in `organizations` for q_organization_name queries,
+      // but in `accounts` for generic keyword queries. selectCompaniesArray handles this.
+      const simplifiedCompanies = selectCompaniesArray(result).map(simplifyCompany);
 
       const summary = {
         total_results: result.pagination?.total_entries || 0,
@@ -412,16 +400,8 @@ server.registerTool(
   async (args: any) => {
     try {
       const parsed = EnrichPersonInput.parse(args || {});
-      const { reveal_personal_emails, reveal_phone_number, name, company, ...body } = parsed;
-      // Apollo expects first_name/last_name/organization_name, not name/company
-      if (name) {
-        const parts = name.trim().split(/\s+/);
-        body.first_name = parts[0];
-        body.last_name = parts.slice(1).join(' ');
-      }
-      if (company) {
-        body.organization_name = company;
-      }
+      const { reveal_personal_emails, reveal_phone_number, name, company, ...rest } = parsed;
+      const body = buildPersonMatchBody({ name, company }, rest);
       const json = await apollo.matchPerson(
         body,
         reveal_personal_emails ?? false,
