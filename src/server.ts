@@ -412,7 +412,16 @@ server.registerTool(
   async (args: any) => {
     try {
       const parsed = EnrichPersonInput.parse(args || {});
-      const { reveal_personal_emails, reveal_phone_number, ...body } = parsed;
+      const { reveal_personal_emails, reveal_phone_number, name, company, ...body } = parsed;
+      // Apollo expects first_name/last_name/organization_name, not name/company
+      if (name) {
+        const parts = name.trim().split(/\s+/);
+        body.first_name = parts[0];
+        body.last_name = parts.slice(1).join(' ');
+      }
+      if (company) {
+        body.organization_name = company;
+      }
       const json = await apollo.matchPerson(
         body,
         reveal_personal_emails ?? false,
