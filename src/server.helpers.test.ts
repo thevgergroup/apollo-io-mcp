@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody } from './server.js';
+import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody } from './server.helpers.js';
 
 describe('selectCompaniesArray', () => {
   it('returns organizations when non-empty', () => {
