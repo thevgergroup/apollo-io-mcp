@@ -355,8 +355,10 @@ server.registerTool(
       const result = await apollo.searchCompanies(body) as any;
 
       // Simplify the response for Claude Desktop
-      // 🐛 FIX: Changed from result.accounts to result.organizations
-      const simplifiedCompanies = result.organizations?.map((company: any) => ({
+      // Apollo returns companies in `organizations` when using q_organization_name,
+      // but in `accounts` for generic keyword queries. Fall back to accounts.
+      const companies = result.organizations?.length ? result.organizations : result.accounts;
+      const simplifiedCompanies = companies?.map((company: any) => ({
         id: company.id,
         name: company.name,
         website: company.website_url,
