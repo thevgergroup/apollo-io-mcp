@@ -355,8 +355,10 @@ server.registerTool(
       const result = await apollo.searchCompanies(body) as any;
 
       // Simplify the response for Claude Desktop
-      // 🐛 FIX: Changed from result.accounts to result.organizations
-      const simplifiedCompanies = result.organizations?.map((company: any) => ({
+      // Apollo returns companies in `organizations` when using q_organization_name,
+      // but in `accounts` for generic keyword queries. Fall back to accounts.
+      const companies = result.organizations?.length ? result.organizations : result.accounts;
+      const simplifiedCompanies = companies?.map((company: any) => ({
         id: company.id,
         name: company.name,
         website: company.website_url,
@@ -410,7 +412,16 @@ server.registerTool(
   async (args: any) => {
     try {
       const parsed = EnrichPersonInput.parse(args || {});
-      const { reveal_personal_emails, reveal_phone_number, ...body } = parsed;
+      const { reveal_personal_emails, reveal_phone_number, name, company, ...body } = parsed;
+      // Apollo expects first_name/last_name/organization_name, not name/company
+      if (name) {
+        const parts = name.trim().split(/\s+/);
+        body.first_name = parts[0];
+        body.last_name = parts.slice(1).join(' ');
+      }
+      if (company) {
+        body.organization_name = company;
+      }
       const json = await apollo.matchPerson(
         body,
         reveal_personal_emails ?? false,
