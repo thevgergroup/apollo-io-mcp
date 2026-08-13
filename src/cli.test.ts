@@ -84,6 +84,20 @@ describe('CLI Tool', () => {
       expect(output).toContain('--linkedin_url');
       expect(output).toContain('--reveal_personal_emails');
     });
+
+    it('should print skills guidance without APOLLO_API_KEY', () => {
+      const envWithoutKey = { ...process.env };
+      delete envWithoutKey.APOLLO_API_KEY;
+
+      const output = execSync(`node ${CLI_PATH} skills`, {
+        encoding: 'utf8',
+        env: envWithoutKey
+      });
+
+      expect(output).toContain('Apollo.io MCP Server and CLI Skills');
+      expect(output).toContain('Best Install Path');
+      expect(output).toContain('The VGER Group');
+    });
   });
 
   describe('Error Handling', () => {

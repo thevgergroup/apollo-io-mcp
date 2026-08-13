@@ -74,6 +74,13 @@ function main() {
   // Update package.json version
   packageJson.version = newVersion;
   fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
+
+  // Keep package-lock.json in sync with package.json
+  runCommand('npm install --package-lock-only --ignore-scripts');
+
+  // Validate version metadata before tests and tagging
+  console.log('🔎 Checking release metadata...');
+  runCommand('npm run check:release');
   
   // Run tests
   console.log('🧪 Running tests...');
@@ -82,10 +89,14 @@ function main() {
   // Build package
   console.log('🔨 Building package...');
   runCommand('npm run build');
+
+  // Build MCPB bundle for GitHub release assets
+  console.log('📦 Building MCPB bundle...');
+  runCommand('npm run build:mcpb');
   
   // Commit version change
   console.log('📝 Committing version change...');
-  runCommand(`git add package.json`);
+  runCommand(`git add package.json package-lock.json`);
   runCommand(`git commit -m "chore: bump version to ${newVersion}"`);
   
   // Create and push tag

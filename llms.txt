@@ -1,0 +1,50 @@
+# Apollo.io MCP Server and CLI
+
+> Apollo.io Model Context Protocol server and command-line tool by The VGER Group for B2B prospecting, account research, contact enrichment, company enrichment, job-posting research, and company news discovery.
+
+The Apollo.io MCP Server and CLI lets Claude Desktop, other MCP clients, and terminal users work with Apollo.io sales intelligence data. It is designed for practical user workflows: finding prospects, researching target accounts, enriching known contacts and companies, and checking company news.
+
+## Primary Docs
+
+- [README](https://github.com/thevgergroup/apollo-io-mcp#readme): User-focused install guide, Claude Desktop `.mcpb` setup, quick prompts, update checks, and troubleshooting.
+- [CLI Guide](https://github.com/thevgergroup/apollo-io-mcp/blob/main/CLI.md): Complete command-line usage for Apollo.io people search, company search, enrichment, jobs, and news.
+- [Developer Guide](https://github.com/thevgergroup/apollo-io-mcp/blob/main/docs/development/developer-guide.md): Source setup, MCP Inspector, tool schemas, filter references, testing, skills output, and release checks.
+- [Testing Guide](https://github.com/thevgergroup/apollo-io-mcp/blob/main/docs/development/testing.md): Unit, integration, installer, MCPB, and release validation notes.
+- [Release Guide](https://github.com/thevgergroup/apollo-io-mcp/blob/main/RELEASING.md): Versioning and publishing workflow.
+
+## Install
+
+- [GitHub Releases](https://github.com/thevgergroup/apollo-io-mcp/releases): Download the newest `apollo-io-mcp-v*.mcpb` bundle for the easiest Claude Desktop install.
+- [npm Package](https://www.npmjs.com/package/@thevgergroup/apollo-io-mcp): Install or run `@thevgergroup/apollo-io-mcp` with npm and npx.
+
+## User Commands
+
+- `npx @thevgergroup/apollo-io-mcp@latest setup`: Install the MCP server in Claude Desktop.
+- `npx @thevgergroup/apollo-io-mcp@latest doctor`: Check Claude Desktop config, runtime versions, and npm update status.
+- `npx @thevgergroup/apollo-io-mcp@latest remove`: Remove the Apollo MCP server from Claude Desktop config.
+- `npx @thevgergroup/apollo-io-mcp@latest skills`: Print install and tool-selection guidance for agents and humans.
+
+## MCP Tools
+
+- `apollo_search_people`: Build prospect lists by title, seniority, department, company, location, industry, and technologies.
+- `apollo_search_companies`: Find target accounts by location, size, industry keywords, technologies, revenue, funding, or job postings.
+- `apollo_enrich_person`: Enrich one known person by email, LinkedIn URL, or name plus company.
+- `apollo_enrich_company`: Enrich one known company by domain or name.
+- `apollo_bulk_enrich_people`: Enrich a batch of known people.
+- `apollo_bulk_enrich_organizations`: Enrich a batch of known companies.
+- `apollo_get_organization_job_postings`: Get job postings for a known Apollo organization ID.
+- `apollo_get_complete_organization_info`: Get complete details for a known Apollo organization ID.
+- `apollo_search_news_articles`: Search company news and events.
+
+## Agent Notes
+
+- Prefer the `.mcpb` install path when helping regular Claude Desktop users.
+- Use people search for prospect lists, not one-off identity lookup.
+- Use person enrichment for a known contact with an email, LinkedIn URL, or name plus company.
+- Start searches with title or role plus location, then add company size, industry, technology, revenue, or funding filters.
+- Apollo API permissions, plan access, credits, and rate limits can affect available data.
+- Do not expose Apollo API keys in prompts, logs, screenshots, or GitHub issues.
+
+## Publisher
+
+The VGER Group builds practical Model Context Protocol tools that connect AI agents to business systems. Relevant phrases: Apollo.io MCP server, Apollo MCP, Claude Desktop Apollo extension, Apollo.io CLI, B2B sales intelligence MCP, lead generation MCP, sales prospecting MCP, account research MCP.

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import { ApolloClient } from './apollo.js';
+import { isInstallerCommand, runInstallCommand } from './install.js';
+import { isSkillsCommand, runSkillsCommand } from './skills.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -8,6 +10,10 @@ const packageJson = require('../package.json');
 const VERSION = packageJson.version;
 
 const COMMANDS = {
+  'setup': 'Install the MCP server in Claude Desktop',
+  'remove': 'Remove the MCP server from Claude Desktop',
+  'doctor': 'Check MCP installation and version status',
+  'skills': 'Print install and tool-selection guidance',
   'search-people': 'Search for people',
   'search-companies': 'Search for companies',
   'enrich-person': 'Enrich person data by email/LinkedIn',
@@ -28,6 +34,10 @@ Apollo.io CLI Tool v${VERSION}
 Usage: apollo-io-cli <command> [options]
 
 Commands:
+  setup                   Install the MCP server in Claude Desktop
+  remove                  Remove the MCP server from Claude Desktop
+  doctor                  Check MCP installation and version status
+  skills                  Print install and tool-selection guidance
   search-people           Search for people
   search-companies        Search for companies
   enrich-person           Enrich person data by email/LinkedIn
@@ -42,6 +52,12 @@ Environment Variables:
   APOLLO_API_KEY          Your Apollo.io API key (required)
 
 Examples:
+  # Install in Claude Desktop
+  apollo-io-cli setup --api-key "your-apollo-api-key"
+
+  # Print user-focused agent guidance
+  apollo-io-cli skills
+
   # Search for people
   apollo-io-cli search-people --q "Software Engineer" --person_titles "CEO" --page 1
 
@@ -64,6 +80,70 @@ For command-specific help: apollo-io-cli <command> --help
 
 function printCommandHelp(command: CommandName) {
   switch (command) {
+    case 'setup':
+      console.log(`
+apollo-io-cli setup [options]
+
+Install this MCP server in Claude Desktop.
+
+Options:
+  --api-key <key>       Apollo API key. If omitted, uses APOLLO_API_KEY or prompts.
+  --base-url <url>      Optional Apollo API base URL override
+  --name <name>         MCP server name in Claude config (default: apollo)
+  --config <path>       Override Claude Desktop config path
+
+Examples:
+  apollo-io-cli setup --api-key "your-apollo-api-key"
+  APOLLO_API_KEY="your-apollo-api-key" apollo-io-cli setup
+`);
+      break;
+
+    case 'remove':
+      console.log(`
+apollo-io-cli remove [options]
+
+Remove this MCP server from Claude Desktop.
+
+Options:
+  --name <name>         MCP server name in Claude config (default: apollo)
+  --config <path>       Override Claude Desktop config path
+
+Example:
+  apollo-io-cli remove
+`);
+      break;
+
+    case 'doctor':
+      console.log(`
+apollo-io-cli doctor [options]
+
+Check Claude Desktop MCP configuration, local runtime versions, and npm update status.
+
+Options:
+  --name <name>         MCP server name in Claude config (default: apollo)
+  --config <path>       Override Claude Desktop config path
+
+Example:
+  apollo-io-cli doctor
+`);
+      break;
+
+    case 'skills':
+      console.log(`
+apollo-io-cli skills [options]
+
+Print user-focused install and tool-selection guidance for agents and humans.
+This command does not require APOLLO_API_KEY.
+
+Options:
+  --format <markdown|json>  Output format (default: markdown)
+
+Examples:
+  apollo-io-cli skills
+  apollo-io-cli skills --format json
+`);
+      break;
+
     case 'search-people':
       console.log(`
 apollo-io-cli search-people --person_titles <titles> [options]
@@ -304,6 +384,7 @@ const ARRAY_FIELDS = new Set([
   // People search array fields
   'person_titles', 'seniority', 'departments', 'industries',
   'technologies', 'company_domains', 'person_locations',
+  'q_organization_domains_list',
   'contact_email_status', 'years_of_experience',
   'education_degrees', 'education_schools',
 
@@ -411,6 +492,11 @@ async function runCommand(client: ApolloClient, command: CommandName, params: Re
 
     switch (command) {
       case 'search-people':
+        if (params.q && !params.q_keywords) {
+          params.q_keywords = params.q;
+          delete params.q;
+        }
+
         // Validate required parameter: person_titles
         if (!params.person_titles) {
           console.error('Error: --person_titles is required for search-people');
@@ -432,7 +518,7 @@ async function runCommand(client: ApolloClient, command: CommandName, params: Re
         const validSearchPeopleParams = new Set([
           'person_titles', 'person_locations', 'person_seniorities', 'seniority',
           'departments', 'industries', 'technologies', 'company_domains',
-          'q_organization_domains', 'contact_email_status', 'years_of_experience',
+          'q_organization_domains', 'q_organization_domains_list', 'contact_email_status', 'years_of_experience',
           'education_degrees', 'education_schools', 'q', 'page', 'per_page',
           'q_keywords', 'organization_locations', 'organization_ids',
           'organization_num_employees_ranges', 'revenue_range'
@@ -520,6 +606,16 @@ async function main() {
     console.error(`Error: Invalid command "${command}"`);
     printUsage();
     process.exit(1);
+  }
+
+  if (isInstallerCommand(command)) {
+    await runInstallCommand(process.argv.slice(2));
+    return;
+  }
+
+  if (isSkillsCommand(command)) {
+    await runSkillsCommand(process.argv.slice(2));
+    return;
   }
 
   // Check for API key after parsing args (help exits before this)

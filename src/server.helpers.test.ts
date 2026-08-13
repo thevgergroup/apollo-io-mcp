@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody } from './server.helpers.js';
+import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody, buildPeopleSearchBody } from './server.helpers.js';
 
 describe('selectCompaniesArray', () => {
   it('returns organizations when non-empty', () => {
@@ -93,6 +93,59 @@ describe('simplifyCompany', () => {
       country: 'USA',
     };
     expect(simplifyCompany(raw).location).toBe('123 Main St');
+  });
+});
+
+describe('buildPeopleSearchBody', () => {
+  it('maps query, filters, and pagination to Apollo people search parameters', () => {
+    const body = buildPeopleSearchBody({
+      query: 'EOS Implementer',
+      filters: {
+        locations: ['United States'],
+        seniority: ['director'],
+        titles: ['EOS Implementer'],
+        departments: ['consulting'],
+        company_domains: ['example.com'],
+        company_names: ['Example Co'],
+        industries: ['management consulting'],
+        technologies: ['salesforce'],
+        years_of_experience: ['10,20'],
+        education_degrees: ['MBA'],
+        education_schools: ['University of Example'],
+      },
+      page: 2,
+      per_page: 5,
+    });
+
+    expect(body).toEqual({
+      q_keywords: 'EOS Implementer',
+      person_locations: ['United States'],
+      person_seniorities: ['director'],
+      person_titles: ['EOS Implementer'],
+      person_departments: ['consulting'],
+      q_organization_domains_list: ['example.com'],
+      organization_names: ['Example Co'],
+      organization_industries: ['management consulting'],
+      currently_using_any_of_technology_uids: ['salesforce'],
+      person_years_of_experience_ranges: ['10,20'],
+      person_education_degrees: ['MBA'],
+      person_education_schools: ['University of Example'],
+      page: 2,
+      per_page: 5,
+    });
+  });
+
+  it('skips undefined filters and preserves unknown filter keys', () => {
+    const body = buildPeopleSearchBody({
+      filters: {
+        titles: undefined,
+        contact_email_status: ['verified'],
+      },
+    });
+
+    expect(body).toEqual({
+      contact_email_status: ['verified'],
+    });
   });
 });
 

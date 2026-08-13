@@ -26,6 +26,48 @@ export function simplifyCompany(company: any): Record<string, any> {
   };
 }
 
+type PeopleSearchFilters = Record<string, unknown>;
+
+const PEOPLE_SEARCH_FILTER_MAP: Record<string, string> = {
+  locations: 'person_locations',
+  seniority: 'person_seniorities',
+  titles: 'person_titles',
+  departments: 'person_departments',
+  company_domains: 'q_organization_domains_list',
+  company_names: 'organization_names',
+  industries: 'organization_industries',
+  technologies: 'currently_using_any_of_technology_uids',
+  years_of_experience: 'person_years_of_experience_ranges',
+  education_degrees: 'person_education_degrees',
+  education_schools: 'person_education_schools',
+};
+
+/**
+ * Converts the MCP-friendly people search schema into Apollo API parameter names.
+ */
+export function buildPeopleSearchBody(parsed: {
+  query?: string;
+  filters?: PeopleSearchFilters;
+  page?: number;
+  per_page?: number;
+}): Record<string, unknown> {
+  const body: Record<string, unknown> = {};
+
+  if (parsed.query) body.q_keywords = parsed.query;
+
+  if (parsed.filters) {
+    for (const [key, value] of Object.entries(parsed.filters)) {
+      if (value === undefined) continue;
+      body[PEOPLE_SEARCH_FILTER_MAP[key] ?? key] = value;
+    }
+  }
+
+  if (parsed.page) body.page = parsed.page;
+  if (parsed.per_page) body.per_page = parsed.per_page;
+
+  return body;
+}
+
 /**
  * Splits a full name string and optional company into Apollo API fields.
  * Apollo expects first_name/last_name/organization_name, not name/company.
