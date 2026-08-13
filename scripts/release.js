@@ -78,6 +78,11 @@ function main() {
   // Keep package-lock.json in sync with package.json
   runCommand('npm install --package-lock-only --ignore-scripts');
 
+  // Remove generated bundle metadata from previous local checks before validating
+  // the new package version.
+  fs.rmSync(path.join(__dirname, '..', '.mcpb-build'), { recursive: true, force: true });
+  fs.rmSync(path.join(__dirname, '..', 'release'), { recursive: true, force: true });
+
   // Validate version metadata before tests and tagging
   console.log('🔎 Checking release metadata...');
   runCommand('npm run check:release');
