@@ -7,7 +7,7 @@ on:
 
 permissions:
   id-token: write  # Required for OIDC
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -29,12 +29,24 @@ jobs:
         
       - name: Install dependencies
         run: npm ci
+
+      - name: Check release metadata
+        run: npm run check:release
         
       - name: Run tests
         run: npm test
         
       - name: Build package
         run: npm run build
+
+      - name: Build MCPB bundle
+        run: npm run build:mcpb
         
       - name: Publish to npm
         run: npm publish --provenance=false
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.mcpb
+          generate_release_notes: true

@@ -8,15 +8,19 @@
     "api",
     "sales",
     "prospecting",
-    "lead-generation"
+    "lead-generation",
+    "claude-desktop",
+    "mcpb",
+    "sales-intelligence"
   ],
-  "author": "The Vger Group",
+  "author": "The VGER Group",
   "license": "MIT",
   "type": "module",
   "main": "dist/server.js",
   "bin": {
     "apollo-io-mcp": "dist/server.js",
-    "apollo-io-cli": "dist/cli.js"
+    "apollo-io-cli": "dist/cli.js",
+    "apollo-io-mcp-setup": "dist/cli.js"
   },
   "repository": {
     "type": "git",
@@ -35,8 +39,10 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/post-build.js",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.json && node scripts/post-build.js",
     "dev": "tsx watch src/server.ts",
+    "setup:dev": "scripts/setup-dev.sh",
     "start": "node dist/server.js",
     "prepare": "npm run build",
     "test": "vitest run",
@@ -44,8 +50,11 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:unit": "vitest run --exclude src/__tests__/integration.test.ts",
+    "setup:inspector": "scripts/setup-inspector.sh",
     "inspector": "npx @modelcontextprotocol/inspector --config mcp-inspector.json",
     "inspector:cli": "npx @modelcontextprotocol/inspector --cli --config mcp-inspector.json --server apollo",
+    "build:mcpb": "npm run build && node scripts/build-mcpb.js",
+    "check:release": "node scripts/check-release.js",
     "prepublishOnly": "npm run build && npm test",
     "release:patch": "node scripts/release.js patch",
     "release:minor": "node scripts/release.js minor",
@@ -54,12 +63,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
     "dotenv": "^17.2.3",
-    "undici": "^8.0.3",
+    "undici": "^7.16.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "^2.0.0",
     "@types/node": "^26.0.0",
+    "@anthropic-ai/mcpb": "^2.1.2",
     "@vitest/coverage-v8": "^4.0.18",
     "tsx": "^4.19.1",
     "typescript": "^5.5.4",
@@ -71,6 +81,8 @@
   "files": [
     "dist",
     "README.md",
+    "CLI.md",
+    "llms.txt",
     "LICENSE"
   ]
 }

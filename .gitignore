@@ -3,6 +3,10 @@ dist
 .env
 coverage
 *.log
+.mcpb-build/
+release/
+.mcp.json
+.claude/
 
 # MCP Inspector config (may contain sensitive data)
 mcp-inspector.json

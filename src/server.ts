@@ -3,9 +3,21 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { ApolloClient } from "./apollo.js";
-import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody } from "./server.helpers.js";
+import { isInstallerCommand, runInstallCommand } from "./install.js";
+import { isSkillsCommand, runSkillsCommand } from "./skills.js";
+import { selectCompaniesArray, simplifyCompany, buildPersonMatchBody, buildPeopleSearchBody } from "./server.helpers.js";
 
 // ----- Config -----
+if (isInstallerCommand(process.argv[2])) {
+  await runInstallCommand(process.argv.slice(2));
+  process.exit(0);
+}
+
+if (isSkillsCommand(process.argv[2])) {
+  await runSkillsCommand(process.argv.slice(2));
+  process.exit(0);
+}
+
 const apiKey = process.env.APOLLO_API_KEY;
 if (!apiKey) {
   console.error("APOLLO_API_KEY is required (env).");
@@ -162,11 +174,7 @@ server.registerTool(
   async (args: any) => {
     try {
       const parsed = SearchPeopleInput.parse(args || {});
-      const body: Record<string, unknown> = {};
-      if (parsed.query) body.q = parsed.query;
-      if (parsed.filters) Object.assign(body, parsed.filters);
-      if (parsed.page) body.page = parsed.page;
-      if (parsed.per_page) body.per_page = parsed.per_page;
+      const body = buildPeopleSearchBody(parsed);
 
       const result = await apollo.searchPeople(body) as any;
 

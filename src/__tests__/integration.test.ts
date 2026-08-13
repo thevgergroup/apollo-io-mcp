@@ -33,7 +33,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
   describe('Search People', () => {
     it('should search for people with basic query', async () => {
       const response = await client.searchPeople({
-        q: 'Software Engineer',
+        q_keywords: 'Software Engineer',
         page: 1,
         per_page: 5
       }) as any;
@@ -46,7 +46,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
     it('should search people with filters', async () => {
       const response = await client.searchPeople({
         person_titles: ['CEO', 'CTO'],
-        q_organization_domains: ['apollo.io'],
+        q_organization_domains_list: ['apollo.io'],
         page: 1,
         per_page: 5
       }) as any;
@@ -57,7 +57,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
 
     it('should handle queries gracefully', async () => {
       const response = await client.searchPeople({
-        q: 'xyzinvalidquery12345nonexistent',
+        q_keywords: 'xyzinvalidquery12345nonexistent',
         page: 1,
         per_page: 5
       }) as any;
@@ -249,7 +249,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
       // Apollo has rate limits, but we won't intentionally trigger them
       // This test just verifies our error handling is in place
       try {
-        await client.searchPeople({ q: 'test', page: 1 });
+        await client.searchPeople({ q_keywords: 'test', page: 1 });
         expect(true).toBe(true); // Should succeed under normal conditions
       } catch (error: any) {
         if (error.message.includes('429')) {
@@ -266,7 +266,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
       });
 
       await expect(
-        invalidClient.searchPeople({ q: 'test' })
+        invalidClient.searchPeople({ q_keywords: 'test' })
       ).rejects.toThrow(/Unauthorized|invalid/i);
     });
 
@@ -277,7 +277,7 @@ describeIntegration('Apollo.io Integration Tests', () => {
       });
 
       await expect(
-        client.searchPeople({ q: 'test' })
+        client.searchPeople({ q_keywords: 'test' })
       ).rejects.toThrow();
     });
   });

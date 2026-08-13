@@ -73,6 +73,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check release metadata
+        run: npm run check:release
+
+      - name: Build MCPB bundle
+        run: npm run build:mcpb
+
   security:
     name: Security Scan
     runs-on: ubuntu-latest

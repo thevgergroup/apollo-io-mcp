@@ -19,7 +19,8 @@ apollo-io-cli --help
 ### Using with npx (No Installation)
 
 ```bash
-npx @thevgergroup/apollo-io-mcp search-people --q "Software Engineer"
+APOLLO_API_KEY=your_api_key_here \
+  npx -p @thevgergroup/apollo-io-mcp apollo-io-cli search-people --person_titles "Software Engineer"
 ```
 
 ### Local Development
@@ -45,6 +46,36 @@ APOLLO_API_KEY=your_api_key_here
 ```
 
 ## Commands
+
+### setup
+
+Install the MCP server in Claude Desktop:
+
+```bash
+npx @thevgergroup/apollo-io-mcp@latest setup
+```
+
+Useful variants:
+
+```bash
+# Non-interactive install
+npx @thevgergroup/apollo-io-mcp@latest setup --api-key "your-apollo-api-key"
+
+# Check Claude Desktop config and npm update status
+npx @thevgergroup/apollo-io-mcp@latest doctor
+
+# Remove from Claude Desktop config
+npx @thevgergroup/apollo-io-mcp@latest remove
+```
+
+### skills
+
+Print a compact guide for install choices, tool selection, update checks, and agent-facing usage notes. This command does not require `APOLLO_API_KEY`.
+
+```bash
+apollo-io-cli skills
+apollo-io-cli skills --format json
+```
 
 ### search-people
 
@@ -79,7 +110,7 @@ apollo-io-cli search-people --person_titles "CTO" --per_page 10
 
 # Using JSON input
 apollo-io-cli search-people --json '{
-  "q": "Product Manager",
+  "q_keywords": "Product Manager",
   "person_titles": ["VP Product", "Head of Product"],
   "page": 1,
   "per_page": 10
@@ -93,7 +124,8 @@ apollo-io-cli search-people --json '{
 - `--departments` - Departments (e.g., "Engineering,Sales")
 - `--industries` - Industries (e.g., "Software,SaaS")
 - `--technologies` - Technologies (e.g., "python,react")
-- `--q_organization_domains` - Company domains (e.g., "google.com,microsoft.com")
+- `--q_keywords` - Keyword query
+- `--q_organization_domains_list` - Company domains (e.g., "google.com,microsoft.com")
 
 ### search-companies
 
@@ -214,7 +246,7 @@ All commands output JSON to stdout. You can pipe the output to tools like `jq` f
 
 ```bash
 # Extract just the names
-apollo-io-cli search-people --q "CEO" | jq '.people[].name'
+apollo-io-cli search-people --person_titles "CEO" | jq '.people[].name'
 
 # Count results
 apollo-io-cli search-companies --q "tech" | jq '.pagination.total_entries'
@@ -236,7 +268,7 @@ apollo-io-cli enrich-person --email "tim@apollo.io" | jq '.'
 ```bash
 apollo-io-cli search-people \
   --person_titles "CTO,Chief Technology Officer" \
-  --q "Series A"
+  --q_keywords "Series A"
 ```
 
 ### Export company list to CSV
@@ -327,6 +359,7 @@ The following fields are automatically converted to arrays (even for single valu
 **People search:**
 - `person_titles`, `seniority`, `departments`, `industries`
 - `technologies`, `company_domains`, `person_locations`
+- `q_organization_domains_list`
 - `contact_email_status`, `years_of_experience`
 - `education_degrees`, `education_schools`
 
