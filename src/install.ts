@@ -211,7 +211,7 @@ function getCommandVersion(command: string, args: string[]): string | undefined 
 
 async function getLatestPublishedVersion(): Promise<string | undefined> {
   try {
-    const response = await fetch(`https://registry.npmjs.org/${encodeURIComponent(packageJson.name).replace('%40', '@')}/latest`);
+    const response = await fetch(`https://registry.npmjs.org/${encodeURIComponent(packageJson.name)}/latest`);
     if (!response.ok) return undefined;
     const body = await response.json() as { version?: string };
     return body.version;

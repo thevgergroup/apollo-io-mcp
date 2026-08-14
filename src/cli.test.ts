@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { execSync } from 'child_process';
+import { execFileSync, type ExecFileSyncOptionsWithStringEncoding } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,6 +7,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const CLI_PATH = path.join(__dirname, '..', 'dist', 'cli.js');
+
+function runCli(args: string[], options: Partial<ExecFileSyncOptionsWithStringEncoding> = {}) {
+  return execFileSync(process.execPath, [CLI_PATH, ...args], {
+    encoding: 'utf8',
+    stdio: 'pipe',
+    ...options,
+  });
+}
 
 describe('CLI Tool', () => {
   const originalEnv = process.env;
@@ -21,20 +29,20 @@ describe('CLI Tool', () => {
 
   describe('Help and Usage', () => {
     it('should display version with --version flag', () => {
-      const output = execSync(`node ${CLI_PATH} --version`, { encoding: 'utf8' });
+      const output = runCli(['--version']);
 
       // Should match semver pattern (e.g., 2.1.0)
       expect(output.trim()).toMatch(/^\d+\.\d+\.\d+$/);
     });
 
     it('should display version with -v flag', () => {
-      const output = execSync(`node ${CLI_PATH} -v`, { encoding: 'utf8' });
+      const output = runCli(['-v']);
 
       expect(output.trim()).toMatch(/^\d+\.\d+\.\d+$/);
     });
 
     it('should display help with --help flag', () => {
-      const output = execSync(`node ${CLI_PATH} --help`, { encoding: 'utf8' });
+      const output = runCli(['--help']);
 
       expect(output).toContain('Apollo.io CLI Tool');
       expect(output).toContain('Usage:');
@@ -44,7 +52,7 @@ describe('CLI Tool', () => {
     });
 
     it('should display help with -h flag', () => {
-      const output = execSync(`node ${CLI_PATH} -h`, { encoding: 'utf8' });
+      const output = runCli(['-h']);
 
       expect(output).toContain('Apollo.io CLI Tool');
       // Should also show version in help
@@ -52,13 +60,13 @@ describe('CLI Tool', () => {
     });
 
     it('should display help with no arguments', () => {
-      const output = execSync(`node ${CLI_PATH}`, { encoding: 'utf8' });
+      const output = runCli([]);
 
       expect(output).toContain('Apollo.io CLI Tool');
     });
 
     it('should display command-specific help for search-people', () => {
-      const output = execSync(`node ${CLI_PATH} search-people --help`, { encoding: 'utf8' });
+      const output = runCli(['search-people', '--help']);
 
       expect(output).toContain('search-people --person_titles');
       expect(output).toContain('REQUIRED');
@@ -69,7 +77,7 @@ describe('CLI Tool', () => {
     });
 
     it('should display command-specific help for search-companies', () => {
-      const output = execSync(`node ${CLI_PATH} search-companies --help`, { encoding: 'utf8' });
+      const output = runCli(['search-companies', '--help']);
 
       expect(output).toContain('search-companies [options]');
       expect(output).toContain('--organization_locations');
@@ -77,7 +85,7 @@ describe('CLI Tool', () => {
     });
 
     it('should display command-specific help for enrich-person', () => {
-      const output = execSync(`node ${CLI_PATH} enrich-person --help`, { encoding: 'utf8' });
+      const output = runCli(['enrich-person', '--help']);
 
       expect(output).toContain('enrich-person [options]');
       expect(output).toContain('--email');
@@ -89,8 +97,7 @@ describe('CLI Tool', () => {
       const envWithoutKey = { ...process.env };
       delete envWithoutKey.APOLLO_API_KEY;
 
-      const output = execSync(`node ${CLI_PATH} skills`, {
-        encoding: 'utf8',
+      const output = runCli(['skills'], {
         env: envWithoutKey
       });
 
@@ -106,15 +113,14 @@ describe('CLI Tool', () => {
       delete envWithoutKey.APOLLO_API_KEY;
 
       try {
-        execSync(`node ${CLI_PATH} search-people --person_titles "Manager" --q "test"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--person_titles', 'Manager', '--q', 'test'], {
           env: envWithoutKey,
           stdio: 'pipe'
         });
         // If we get here, the command succeeded when it should have failed
         throw new Error('Command should have failed without APOLLO_API_KEY');
       } catch (error: any) {
-        // execSync throws on non-zero exit code
+        // execFileSync throws on non-zero exit code
         const output = error.stdout || error.stderr || error.message || '';
         expect(output.toString()).toContain('APOLLO_API_KEY');
       }
@@ -124,8 +130,7 @@ describe('CLI Tool', () => {
       process.env.APOLLO_API_KEY = 'test-key';
 
       try {
-        execSync(`node ${CLI_PATH} invalid-command`, {
-          encoding: 'utf8',
+        runCli(['invalid-command'], {
           env: process.env
         });
         expect.fail('Should have thrown an error');
@@ -138,8 +143,7 @@ describe('CLI Tool', () => {
       process.env.APOLLO_API_KEY = 'test-key';
 
       try {
-        execSync(`node ${CLI_PATH} search-people --person_locations "Virginia"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--person_locations', 'Virginia'], {
           env: process.env,
           stdio: 'pipe'
         });
@@ -155,8 +159,7 @@ describe('CLI Tool', () => {
       process.env.APOLLO_API_KEY = 'test-key';
 
       try {
-        execSync(`node ${CLI_PATH} search-people --person_titles "Manager" --person_location "Virginia"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--person_titles', 'Manager', '--person_location', 'Virginia'], {
           env: process.env,
           stdio: 'pipe',
           timeout: 5000
@@ -177,8 +180,7 @@ describe('CLI Tool', () => {
       process.env.APOLLO_API_KEY = testKey;
 
       try {
-        execSync(`node ${CLI_PATH} search-people --q="Software Engineer" --page=1`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--q=Software Engineer', '--page=1'], {
           env: process.env,
           timeout: 5000
         });
@@ -195,8 +197,7 @@ describe('CLI Tool', () => {
       process.env.APOLLO_API_KEY = testKey;
 
       try {
-        execSync(`node ${CLI_PATH} search-people --q "Software Engineer" --page 1`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--q', 'Software Engineer', '--page', '1'], {
           env: process.env,
           timeout: 5000
         });
@@ -215,8 +216,7 @@ describe('CLI Tool', () => {
 
     it('should accept search-people command', () => {
       try {
-        execSync(`node ${CLI_PATH} search-people --q "test"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--q', 'test'], {
           env: process.env,
           timeout: 5000
         });
@@ -230,8 +230,7 @@ describe('CLI Tool', () => {
 
     it('should accept enrich-person command', () => {
       try {
-        execSync(`node ${CLI_PATH} enrich-person --email "test@example.com"`, {
-          encoding: 'utf8',
+        runCli(['enrich-person', '--email', 'test@example.com'], {
           env: process.env,
           timeout: 5000
         });
@@ -243,8 +242,7 @@ describe('CLI Tool', () => {
 
     it('should require --id for org-jobs command', () => {
       try {
-        execSync(`node ${CLI_PATH} org-jobs`, {
-          encoding: 'utf8',
+        runCli(['org-jobs'], {
           env: process.env,
           timeout: 5000
         });
@@ -257,8 +255,7 @@ describe('CLI Tool', () => {
 
     it('should require --id for org-info command', () => {
       try {
-        execSync(`node ${CLI_PATH} org-info`, {
-          encoding: 'utf8',
+        runCli(['org-info'], {
           env: process.env,
           timeout: 5000
         });
@@ -277,8 +274,7 @@ describe('CLI Tool', () => {
 
     it('should handle --json flag', () => {
       try {
-        execSync(`node ${CLI_PATH} search-people --json '{"q": "test", "page": 1}'`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--json', '{"q": "test", "page": 1}'], {
           env: process.env,
           timeout: 5000
         });
@@ -291,8 +287,7 @@ describe('CLI Tool', () => {
 
     it('should error on invalid JSON', () => {
       try {
-        execSync(`node ${CLI_PATH} search-people --json 'invalid json'`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--json', 'invalid json'], {
           env: process.env,
           timeout: 5000
         });
@@ -311,8 +306,7 @@ describe('CLI Tool', () => {
 
     it('should parse comma-separated values as arrays', () => {
       try {
-        execSync(`node ${CLI_PATH} search-people --person_titles "CEO,CTO,VP"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--person_titles', 'CEO,CTO,VP'], {
           env: process.env,
           timeout: 5000
         });
@@ -324,8 +318,7 @@ describe('CLI Tool', () => {
 
     it('should auto-convert single values to arrays for array fields', () => {
       try {
-        execSync(`node ${CLI_PATH} search-people --person_titles "CTO"`, {
-          encoding: 'utf8',
+        runCli(['search-people', '--person_titles', 'CTO'], {
           env: process.env,
           timeout: 5000
         });
@@ -357,8 +350,7 @@ describe('CLI Integration (requires API key)', () => {
 
   (hasApiKey ? describe : describe.skip)('Real API Calls', () => {
     it('should successfully enrich person by email', () => {
-      const output = execSync(`node ${CLI_PATH} enrich-person --email "tim@apollo.io"`, {
-        encoding: 'utf8',
+      const output = runCli(['enrich-person', '--email', 'tim@apollo.io'], {
         env: process.env,
         timeout: 10000
       });
@@ -370,8 +362,7 @@ describe('CLI Integration (requires API key)', () => {
     }, 15000);
 
     it('should output valid JSON', () => {
-      const output = execSync(`node ${CLI_PATH} enrich-person --email "tim@apollo.io"`, {
-        encoding: 'utf8',
+      const output = runCli(['enrich-person', '--email', 'tim@apollo.io'], {
         env: process.env,
         timeout: 10000
       });
