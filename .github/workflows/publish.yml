@@ -42,7 +42,7 @@ jobs:
         run: npm publish --provenance=false
 
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: release/*.mcpb
           generate_release_notes: true
