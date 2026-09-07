@@ -70,7 +70,7 @@
     "@modelcontextprotocol/inspector": "^2.0.0",
     "@types/node": "^26.0.0",
     "@anthropic-ai/mcpb": "^2.1.2",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^5.0.0",
     "tsx": "^4.19.1",
     "typescript": "^5.5.4",
     "vitest": "^4.0.18"
