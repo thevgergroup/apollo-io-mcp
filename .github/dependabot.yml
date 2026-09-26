@@ -32,6 +32,9 @@ updates:
       # Ignore major updates to vitest (can be breaking)
       - dependency-name: "vitest"
         update-types: ["version-update:semver-major"]
+      # @vitest/* packages peer-depend on the exact vitest version, so they must move with vitest
+      - dependency-name: "@vitest/*"
+        update-types: ["version-update:semver-major"]
       # Ignore major updates to @modelcontextprotocol/sdk (can be breaking)
       - dependency-name: "@modelcontextprotocol/sdk"
         update-types: ["version-update:semver-major"]
