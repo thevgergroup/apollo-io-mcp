@@ -95,7 +95,7 @@ writeJson(path.join(bundleDir, 'manifest.json'), {
   compatibility: {
     platforms: ['darwin', 'win32'],
     runtimes: {
-      node: '>=20.0.0',
+      node: packageJson.engines.node,
     },
   },
   user_config: {
